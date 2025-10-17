@@ -10,9 +10,11 @@ export const zh = {
     edit: "编辑",
     create: "创建",
     search: "搜索",
+    switchLanguage: "切换到英文",
   },
   
   header: {
+    brandName: "AI音乐工坊",
     home: "首页",
     create: "创作音乐",
     orders: "我的订单",

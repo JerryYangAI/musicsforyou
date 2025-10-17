@@ -20,7 +20,7 @@ export function Header({ isAuthenticated = false }: HeaderProps) {
           <div className="p-1.5 bg-gradient-to-br from-primary to-chart-2 rounded-lg">
             <Music className="w-5 h-5 text-white" />
           </div>
-          <span className="font-bold text-lg">{t.hero.title}</span>
+          <span className="font-bold text-lg">{t.header.brandName}</span>
         </Link>
 
         {/* Navigation */}

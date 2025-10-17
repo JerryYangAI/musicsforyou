@@ -12,9 +12,11 @@ export const en: Translations = {
     edit: "Edit",
     create: "Create",
     search: "Search",
+    switchLanguage: "Switch to Chinese",
   },
   
   header: {
+    brandName: "AI Music Studio",
     home: "Home",
     create: "Create Music",
     orders: "My Orders",

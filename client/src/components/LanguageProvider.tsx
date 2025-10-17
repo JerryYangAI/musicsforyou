@@ -12,8 +12,11 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(() => {
-    const saved = localStorage.getItem("locale") as Locale;
-    return saved && saved in locales ? saved : "zh";
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("locale") as Locale;
+      return saved && saved in locales ? saved : "zh";
+    }
+    return "zh";
   });
 
   useEffect(() => {
