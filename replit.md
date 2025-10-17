@@ -158,6 +158,7 @@ Preferred communication style: Simple, everyday language.
   - Username now required and must be unique
   - Registration/login forms simplified to username + password input
   - Updated all API endpoints and storage interfaces
+  - Added password confirmation field in registration (requires password to be entered twice)
   - All auth tests passing successfully
 
 **Build Process**

@@ -32,6 +32,7 @@ export function AuthForm() {
   // Register form state
   const [registerUsername, setRegisterUsername] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
+  const [registerConfirmPassword, setRegisterConfirmPassword] = useState("");
 
   // Validation errors
   const [loginError, setLoginError] = useState("");
@@ -116,13 +117,18 @@ export function AuthForm() {
     setRegisterError("");
 
     // Validation
-    if (!registerUsername || !registerPassword) {
+    if (!registerUsername || !registerPassword || !registerConfirmPassword) {
       setRegisterError(t.auth.invalidInput);
       return;
     }
 
     if (registerPassword.length < 8) {
       setRegisterError(t.auth.invalidInput);
+      return;
+    }
+
+    if (registerPassword !== registerConfirmPassword) {
+      setRegisterError(t.auth.passwordMismatch);
       return;
     }
 
@@ -231,6 +237,21 @@ export function AuthForm() {
                   setRegisterError("");
                 }}
                 data-testid="input-register-password"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="register-confirm-password">{t.auth.confirmPassword}</Label>
+              <Input
+                id="register-confirm-password"
+                type="password"
+                placeholder={t.auth.passwordPlaceholder}
+                value={registerConfirmPassword}
+                onChange={(e) => {
+                  setRegisterConfirmPassword(e.target.value);
+                  setRegisterError("");
+                }}
+                data-testid="input-register-confirm-password"
               />
             </div>
 
