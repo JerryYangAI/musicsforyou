@@ -12,6 +12,7 @@ import CreatePage from "@/pages/CreatePage";
 import OrdersPage from "@/pages/OrdersPage";
 import PaymentPage from "@/pages/PaymentPage";
 import AuthPage from "@/pages/AuthPage";
+import ProfilePage from "@/pages/ProfilePage";
 
 function Router() {
   return (
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/orders" component={OrdersPage} />
       <Route path="/payment" component={PaymentPage} />
       <Route path="/auth" component={AuthPage} />
+      <Route path="/profile" component={ProfilePage} />
       <Route component={NotFound} />
     </Switch>
   );
