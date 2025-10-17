@@ -7,6 +7,7 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUserPassword(userId: string, hashedPassword: string): Promise<void>;
   getPublicMusicTracks(limit?: number): Promise<MusicTrack[]>;
   createMusicTrack(track: InsertMusicTrack): Promise<MusicTrack>;
   getUserOrders(userId: string): Promise<Order[]>;
@@ -105,6 +106,13 @@ export class MemStorage implements IStorage {
     return track;
   }
 
+  async updateUserPassword(userId: string, hashedPassword: string): Promise<void> {
+    const user = this.users.get(userId);
+    if (user) {
+      user.password = hashedPassword;
+    }
+  }
+
   async getUserOrders(userId: string): Promise<Order[]> {
     return [];
   }
@@ -139,6 +147,13 @@ export class DbStorage implements IStorage {
   async createMusicTrack(insertTrack: InsertMusicTrack): Promise<MusicTrack> {
     const [track] = await db.insert(musicTracks).values(insertTrack).returning();
     return track;
+  }
+
+  async updateUserPassword(userId: string, hashedPassword: string): Promise<void> {
+    await db
+      .update(users)
+      .set({ password: hashedPassword })
+      .where(eq(users.id, userId));
   }
 
   async getUserOrders(userId: string): Promise<Order[]> {

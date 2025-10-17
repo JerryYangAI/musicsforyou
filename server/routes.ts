@@ -118,6 +118,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to get user" });
     }
   });
+
+  // Change password endpoint
+  app.post("/api/auth/change-password", async (req, res) => {
+    try {
+      if (!req.session.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const { currentPassword, newPassword } = req.body;
+
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ error: "Current password and new password are required" });
+      }
+
+      if (newPassword.length < 8) {
+        return res.status(400).json({ error: "New password must be at least 8 characters" });
+      }
+
+      const user = await storage.getUser(req.session.userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Verify current password
+      const isValid = await bcrypt.compare(currentPassword, user.password);
+      if (!isValid) {
+        return res.status(401).json({ error: "Incorrect password" });
+      }
+
+      // Hash new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      // Update password in database
+      await storage.updateUserPassword(user.id, hashedPassword);
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Change password error:", error);
+      res.status(500).json({ error: "Failed to change password" });
+    }
+  });
   
   // Get public music tracks for the leaderboard
   app.get("/api/music/public", async (req, res) => {
