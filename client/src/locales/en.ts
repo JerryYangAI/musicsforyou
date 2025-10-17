@@ -170,5 +170,6 @@ export const en: Translations = {
     passwordRequired: "Password is required",
     newPasswordMismatch: "New passwords do not match",
     incorrectPassword: "Incorrect current password",
+    samePasswordError: "New password must be different from current password",
   },
 };

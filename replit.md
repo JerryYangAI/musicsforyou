@@ -172,8 +172,13 @@ Preferred communication style: Simple, everyday language.
   - Implemented POST /api/auth/change-password endpoint with current password verification
   - Added updateUserPassword() to storage interface (MemStorage and DbStorage)
   - Password change form with validation: current password, new password (min 8 chars), confirmation
+  - **Security enhancement: New password must be different from current password**
+    - Backend validates using bcrypt comparison before updating
+    - Returns 400 error with descriptive message if passwords match
+    - Frontend displays localized error message to user
   - Profile button in header navigates to /profile
   - End-to-end tested: registration → password change → logout → login with new password
+  - Tested same-password rejection and appropriate error handling
   - Full Chinese/English i18n support for all profile-related UI
 
 **Build Process**

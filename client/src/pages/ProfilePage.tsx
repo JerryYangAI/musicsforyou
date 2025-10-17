@@ -49,9 +49,14 @@ export default function ProfilePage() {
       setError("");
     },
     onError: (error: Error) => {
-      const errorMessage = error.message.includes("Incorrect password")
-        ? t.profile.incorrectPassword
-        : t.profile.passwordUpdateFailed;
+      let errorMessage = t.profile.passwordUpdateFailed;
+      
+      if (error.message.includes("Incorrect password")) {
+        errorMessage = t.profile.incorrectPassword;
+      } else if (error.message.includes("must be different from current password")) {
+        errorMessage = t.profile.samePasswordError;
+      }
+      
       setError(errorMessage);
       toast({
         title: t.profile.passwordUpdateFailed,

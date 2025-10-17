@@ -168,6 +168,7 @@ export const zh = {
     passwordRequired: "请输入密码",
     newPasswordMismatch: "两次输入的新密码不一致",
     incorrectPassword: "当前密码错误",
+    samePasswordError: "新密码不能与当前密码相同",
   },
 };
 

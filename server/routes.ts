@@ -147,6 +147,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Incorrect password" });
       }
 
+      // Check if new password is different from current password
+      const isSamePassword = await bcrypt.compare(newPassword, user.password);
+      if (isSamePassword) {
+        return res.status(400).json({ error: "New password must be different from current password" });
+      }
+
       // Hash new password
       const hashedPassword = await bcrypt.hash(newPassword, 10);
 
