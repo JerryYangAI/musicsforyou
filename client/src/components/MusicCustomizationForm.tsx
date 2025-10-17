@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,26 +7,31 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
-import { Music2, Guitar, Mic, Piano, Drum, Radio, X } from "lucide-react";
+import { Music2, Guitar, Mic, Piano, Radio, X } from "lucide-react";
+import { useLanguage } from "./LanguageProvider";
 
 const musicStyles = [
-  { id: "pop", label: "流行", icon: Radio },
-  { id: "rock", label: "摇滚", icon: Guitar },
-  { id: "jazz", label: "爵士", icon: Piano },
-  { id: "electronic", label: "电子", icon: Music2 },
-  { id: "hiphop", label: "嘻哈", icon: Mic },
-  { id: "classical", label: "古典", icon: Piano },
+  { id: "pop", icon: Radio },
+  { id: "rock", icon: Guitar },
+  { id: "jazz", icon: Piano },
+  { id: "electronic", icon: Music2 },
+  { id: "hiphop", icon: Mic },
+  { id: "classical", icon: Piano },
 ];
 
-const moods = ["快乐", "悲伤", "激昂", "平静", "浪漫", "神秘", "史诗", "放松"];
+const moodOptions = ["happy", "sad", "energetic", "calm", "romantic", "mysterious", "epic", "relaxed"];
 
 export function MusicCustomizationForm() {
+  const { t } = useLanguage();
+  const [, setLocation] = useLocation();
+  
   const [selectedStyle, setSelectedStyle] = useState<string>("pop");
-  const [selectedMoods, setSelectedMoods] = useState<string[]>(["快乐"]);
-  const [keywords, setKeywords] = useState<string[]>(["夏天", "海边"]);
+  const [selectedMoods, setSelectedMoods] = useState<string[]>(["happy"]);
+  const [keywords, setKeywords] = useState<string[]>([]);
   const [keywordInput, setKeywordInput] = useState("");
   const [description, setDescription] = useState("");
   const [duration, setDuration] = useState([60]);
+  const [errors, setErrors] = useState<{ moods?: string; description?: string }>({});
 
   const toggleMood = (mood: string) => {
     setSelectedMoods(prev =>
@@ -45,25 +51,49 @@ export function MusicCustomizationForm() {
   };
 
   const handleSubmit = () => {
-    console.log("Music customization:", {
-      style: selectedStyle,
-      moods: selectedMoods,
-      keywords,
-      description,
-      duration: duration[0],
-    });
+    // Validate form
+    const newErrors: { moods?: string; description?: string } = {};
+    
+    if (selectedMoods.length === 0) {
+      newErrors.moods = t.music.moodPlaceholder;
+    }
+    
+    if (description.trim().length < 10) {
+      newErrors.description = t.music.detailPlaceholder;
+    }
+    
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+    
+    // Clear errors
+    setErrors({});
+    
+    // Store order details in sessionStorage for the payment page
+    const orderDetails = {
+      musicStyle: selectedStyle,
+      musicMoods: selectedMoods,
+      musicKeywords: keywords,
+      musicDescription: description,
+      musicDuration: duration[0],
+      amount: 29.90,
+    };
+    
+    sessionStorage.setItem("orderDetails", JSON.stringify(orderDetails));
+    setLocation("/payment");
   };
 
   return (
     <Card className="w-full max-w-3xl mx-auto">
       <CardHeader>
-        <CardTitle>定制您的音乐</CardTitle>
-        <CardDescription>描述您想要的音乐风格、情绪和特点</CardDescription>
+        <CardTitle>{t.music.customizeTitle}</CardTitle>
+        <CardDescription>{t.music.customizeDescription}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Music Style Selection */}
         <div className="space-y-3">
-          <Label>音乐风格</Label>
+          <Label>{t.music.style}</Label>
           <div className="grid grid-cols-3 gap-3">
             {musicStyles.map((style) => (
               <button
@@ -77,7 +107,7 @@ export function MusicCustomizationForm() {
                 data-testid={`button-style-${style.id}`}
               >
                 <style.icon className="w-6 h-6 mx-auto mb-2" />
-                <span className="text-sm font-medium">{style.label}</span>
+                <span className="text-sm font-medium">{t.music.styles[style.id as keyof typeof t.music.styles]}</span>
               </button>
             ))}
           </div>
@@ -85,9 +115,9 @@ export function MusicCustomizationForm() {
 
         {/* Mood Selection */}
         <div className="space-y-3">
-          <Label>情绪氛围（可多选）</Label>
+          <Label>{t.music.moodMultiSelect}</Label>
           <div className="flex flex-wrap gap-2">
-            {moods.map((mood) => (
+            {moodOptions.map((mood) => (
               <Badge
                 key={mood}
                 variant={selectedMoods.includes(mood) ? "default" : "outline"}
@@ -95,47 +125,52 @@ export function MusicCustomizationForm() {
                 onClick={() => toggleMood(mood)}
                 data-testid={`badge-mood-${mood}`}
               >
-                {mood}
+                {t.music.moods[mood as keyof typeof t.music.moods]}
               </Badge>
             ))}
           </div>
+          {errors.moods && (
+            <p className="text-sm text-destructive">{errors.moods}</p>
+          )}
         </div>
 
         {/* Keywords */}
         <div className="space-y-3">
-          <Label htmlFor="keywords">关键词</Label>
+          <Label htmlFor="keywords">{t.music.keywords}</Label>
           <div className="flex gap-2">
             <Input
               id="keywords"
-              placeholder="添加关键词，如：海滩、夏日..."
+              placeholder={t.music.keywordsPlaceholder}
               value={keywordInput}
               onChange={(e) => setKeywordInput(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addKeyword())}
               data-testid="input-keyword"
             />
             <Button onClick={addKeyword} data-testid="button-add-keyword">
-              添加
+              {t.music.addKeyword}
             </Button>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {keywords.map((keyword) => (
-              <Badge key={keyword} variant="secondary" className="px-3 py-1">
-                {keyword}
-                <X
-                  className="w-3 h-3 ml-2 cursor-pointer"
-                  onClick={() => removeKeyword(keyword)}
-                  data-testid={`button-remove-${keyword}`}
-                />
-              </Badge>
-            ))}
-          </div>
+          {keywords.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {keywords.map((keyword) => (
+                <Badge key={keyword} variant="secondary" className="px-3 py-1">
+                  {keyword}
+                  <X
+                    className="w-3 h-3 ml-2 cursor-pointer"
+                    onClick={() => removeKeyword(keyword)}
+                    data-testid={`button-remove-${keyword}`}
+                  />
+                </Badge>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Duration */}
         <div className="space-y-3">
           <div className="flex justify-between">
-            <Label>时长</Label>
-            <span className="text-sm text-muted-foreground">{duration[0]}秒</span>
+            <Label>{t.music.duration}</Label>
+            <span className="text-sm text-muted-foreground">{duration[0]}{t.music.durationUnit}</span>
           </div>
           <Slider
             value={duration}
@@ -146,25 +181,31 @@ export function MusicCustomizationForm() {
             data-testid="slider-duration"
           />
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>30秒</span>
-            <span>180秒</span>
+            <span>30{t.music.durationUnit}</span>
+            <span>180{t.music.durationUnit}</span>
           </div>
         </div>
 
         {/* Description */}
         <div className="space-y-3">
-          <Label htmlFor="description">详细描述（可选）</Label>
+          <Label htmlFor="description">{t.music.detailDescription}</Label>
           <Textarea
             id="description"
-            placeholder="描述您想要的音乐细节，如乐器、节奏等..."
+            placeholder={t.music.detailPlaceholder}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            maxLength={500}
             rows={4}
             data-testid="textarea-description"
           />
-          <p className="text-xs text-muted-foreground">
-            {description.length}/500 字符
-          </p>
+          <div className="flex justify-between items-center">
+            <p className="text-xs text-muted-foreground">
+              {description.length}/500 {t.music.characterCount}
+            </p>
+            {errors.description && (
+              <p className="text-sm text-destructive">{errors.description}</p>
+            )}
+          </div>
         </div>
 
         {/* Submit Button */}
@@ -175,7 +216,7 @@ export function MusicCustomizationForm() {
           data-testid="button-submit-customization"
         >
           <Music2 className="w-5 h-5 mr-2" />
-          继续支付 ¥29.9
+          {t.music.continuePay} ¥29.9
         </Button>
       </CardContent>
     </Card>

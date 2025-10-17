@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, boolean, integer, decimal } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -39,3 +39,30 @@ export const insertMusicTrackSchema = createInsertSchema(musicTracks).omit({
 
 export type InsertMusicTrack = z.infer<typeof insertMusicTrackSchema>;
 export type MusicTrack = typeof musicTracks.$inferSelect;
+
+export const orders = pgTable("orders", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  musicDescription: text("music_description").notNull(),
+  musicStyle: text("music_style").notNull(),
+  musicMoods: text("music_moods").array().notNull(),
+  musicKeywords: text("music_keywords").array(),
+  musicDuration: integer("music_duration").notNull(), // in seconds
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  paymentMethod: text("payment_method").notNull(), // "stripe", "wechat", "alipay"
+  paymentStatus: text("payment_status").default("pending").notNull(), // "pending", "paid", "failed"
+  orderStatus: text("order_status").default("pending").notNull(), // "pending", "processing", "completed", "failed"
+  musicTrackId: varchar("music_track_id").references(() => musicTracks.id),
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertOrderSchema = createInsertSchema(orders).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertOrder = z.infer<typeof insertOrderSchema>;
+export type Order = typeof orders.$inferSelect;
