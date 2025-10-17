@@ -1,6 +1,7 @@
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { FeatureSection } from "@/components/FeatureSection";
+import { MusicLeaderboard } from "@/components/MusicLeaderboard";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
@@ -10,6 +11,7 @@ export default function HomePage() {
       <Header />
       <HeroSection />
       <FeatureSection />
+      <MusicLeaderboard />
       
       {/* CTA Section */}
       <section className="py-20 px-6 bg-gradient-to-br from-primary/10 to-chart-2/10">
