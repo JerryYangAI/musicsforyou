@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type MusicTrack, type InsertMusicTrack, users, musicTracks } from "@shared/schema";
+import { type User, type InsertUser, type MusicTrack, type InsertMusicTrack, type Order, users, musicTracks, orders } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
@@ -9,6 +9,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   getPublicMusicTracks(limit?: number): Promise<MusicTrack[]>;
   createMusicTrack(track: InsertMusicTrack): Promise<MusicTrack>;
+  getUserOrders(userId: string): Promise<Order[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -103,6 +104,10 @@ export class MemStorage implements IStorage {
     this.musicTracks.set(id, track);
     return track;
   }
+
+  async getUserOrders(userId: string): Promise<Order[]> {
+    return [];
+  }
 }
 
 export class DbStorage implements IStorage {
@@ -134,6 +139,15 @@ export class DbStorage implements IStorage {
   async createMusicTrack(insertTrack: InsertMusicTrack): Promise<MusicTrack> {
     const [track] = await db.insert(musicTracks).values(insertTrack).returning();
     return track;
+  }
+
+  async getUserOrders(userId: string): Promise<Order[]> {
+    const userOrders = await db
+      .select()
+      .from(orders)
+      .where(eq(orders.userId, userId))
+      .orderBy(desc(orders.createdAt));
+    return userOrders;
   }
 }
 
