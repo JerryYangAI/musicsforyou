@@ -20,19 +20,15 @@ export function ThemeProvider({
   children,
   defaultTheme = "light",
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(defaultTheme);
+  const [theme] = useState<Theme>("light");
 
   useEffect(() => {
     const root = document.documentElement;
     root.classList.remove("dark");
-    if (theme === "dark") {
-      root.classList.add("dark");
-    }
-    localStorage.setItem("theme", theme);
-  }, [theme]);
+  }, []);
 
   return (
-    <ThemeProviderContext.Provider value={{ theme, setTheme }}>
+    <ThemeProviderContext.Provider value={{ theme, setTheme: () => {} }}>
       {children}
     </ThemeProviderContext.Provider>
   );

@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "./ThemeToggle";
 import { LanguageToggle } from "./LanguageToggle";
 import { useLanguage } from "./LanguageProvider";
 import { useAuth } from "./AuthProvider";
@@ -44,7 +43,6 @@ export function Header() {
         {/* Actions */}
         <div className="flex items-center gap-3">
           <LanguageToggle />
-          <ThemeToggle />
           {user ? (
             <>
               <Button 
