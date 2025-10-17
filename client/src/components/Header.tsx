@@ -18,6 +18,10 @@ export function Header() {
     await logout();
     setLocation("/");
   };
+
+  const handleProfileClick = () => {
+    setLocation("/profile");
+  };
   
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -48,6 +52,7 @@ export function Header() {
               <Button 
                 variant="ghost" 
                 size="icon" 
+                onClick={handleProfileClick}
                 title={user.username}
                 data-testid="button-profile"
               >
