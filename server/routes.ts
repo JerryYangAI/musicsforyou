@@ -130,6 +130,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch music tracks" });
     }
   });
+
+  // Get user's orders
+  app.get("/api/orders", async (req, res) => {
+    try {
+      if (!req.session.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const orders = await storage.getUserOrders(req.session.userId);
+      res.json(orders);
+    } catch (error) {
+      console.error("Error fetching user orders:", error);
+      res.status(500).json({ error: "Failed to fetch orders" });
+    }
+  });
   
   // Create payment intent for Stripe
   app.post("/api/create-payment-intent", async (req, res) => {
