@@ -167,6 +167,14 @@ Preferred communication style: Simple, everyday language.
   - Updated OrderList to fetch real orders from API using React Query
   - Each user can only view their own orders (verified with multi-user testing)
   - Displays loading states and empty state messages appropriately
+- ✅ **Added profile management with password change functionality**
+  - Created ProfilePage at /profile route displaying username
+  - Implemented POST /api/auth/change-password endpoint with current password verification
+  - Added updateUserPassword() to storage interface (MemStorage and DbStorage)
+  - Password change form with validation: current password, new password (min 8 chars), confirmation
+  - Profile button in header navigates to /profile
+  - End-to-end tested: registration → password change → logout → login with new password
+  - Full Chinese/English i18n support for all profile-related UI
 
 **Build Process**
 - Client build: Vite bundles React app to dist/public
