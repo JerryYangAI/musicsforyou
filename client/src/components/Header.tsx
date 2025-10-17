@@ -2,15 +2,23 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import { LanguageToggle } from "./LanguageToggle";
 import { useLanguage } from "./LanguageProvider";
-import { Music, User, ShoppingBag } from "lucide-react";
-import { Link } from "wouter";
+import { useAuth } from "./AuthProvider";
+import { Music, User, LogOut } from "lucide-react";
+import { Link, useLocation } from "wouter";
 
-interface HeaderProps {
-  isAuthenticated?: boolean;
-}
-
-export function Header({ isAuthenticated = false }: HeaderProps) {
+export function Header() {
   const { t } = useLanguage();
+  const { user, logout } = useAuth();
+  const [, setLocation] = useLocation();
+
+  const handleLoginClick = () => {
+    setLocation("/auth");
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    setLocation("/");
+  };
   
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -37,17 +45,28 @@ export function Header({ isAuthenticated = false }: HeaderProps) {
         <div className="flex items-center gap-3">
           <LanguageToggle />
           <ThemeToggle />
-          {isAuthenticated ? (
+          {user ? (
             <>
-              <Button variant="ghost" size="icon" data-testid="button-cart">
-                <ShoppingBag className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="icon" data-testid="button-profile">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                title={user.username}
+                data-testid="button-profile"
+              >
                 <User className="w-5 h-5" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={handleLogout}
+                title={t.header.logout}
+                data-testid="button-logout"
+              >
+                <LogOut className="w-5 h-5" />
               </Button>
             </>
           ) : (
-            <Button data-testid="button-login">
+            <Button onClick={handleLoginClick} data-testid="button-login">
               {t.header.login}
             </Button>
           )}
