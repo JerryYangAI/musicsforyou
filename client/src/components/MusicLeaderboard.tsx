@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "./LanguageProvider";
 import { Play, Pause } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import type { MusicTrack } from "@shared/schema";
 
 export function MusicLeaderboard() {
+  const { t } = useLanguage();
   const { data: tracks, isLoading } = useQuery<MusicTrack[]>({
     queryKey: ["/api/music/public"],
   });
@@ -66,7 +68,7 @@ export function MusicLeaderboard() {
     return (
       <section className="py-16 px-6">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold mb-8 text-center">音乐试听榜单</h2>
+          <h2 className="text-3xl font-bold mb-8 text-center">{t.leaderboard.title}</h2>
           <div className="grid gap-4">
             {[1, 2, 3].map((i) => (
               <Card key={i} className="animate-pulse">
@@ -85,10 +87,10 @@ export function MusicLeaderboard() {
     return (
       <section className="py-16 px-6">
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold mb-8 text-center">音乐试听榜单</h2>
+          <h2 className="text-3xl font-bold mb-8 text-center">{t.leaderboard.title}</h2>
           <Card>
             <CardContent className="p-12 text-center">
-              <p className="text-muted-foreground">暂无公开音乐作品</p>
+              <p className="text-muted-foreground">{t.leaderboard.noMusic}</p>
             </CardContent>
           </Card>
         </div>
@@ -100,10 +102,10 @@ export function MusicLeaderboard() {
     <section className="py-16 px-6 bg-card/50">
       <div className="container mx-auto">
         <h2 className="text-3xl font-bold mb-8 text-center" data-testid="heading-leaderboard">
-          音乐试听榜单
+          {t.leaderboard.title}
         </h2>
         <p className="text-center text-muted-foreground mb-8">
-          发现其他用户创作的精彩音乐，每首支持试听10秒
+          {t.leaderboard.subtitle}
         </p>
         <div className="grid gap-4 max-w-4xl mx-auto" data-testid="list-music-tracks">
           {tracks.map((track) => (
@@ -127,7 +129,7 @@ export function MusicLeaderboard() {
                       {track.title}
                     </h3>
                     <p className="text-sm text-muted-foreground" data-testid={`text-username-${track.id}`}>
-                      创作者：{track.username}
+                      {t.leaderboard.creator}：{track.username}
                     </p>
                     {track.description && (
                       <p className="text-sm text-muted-foreground mt-1" data-testid={`text-description-${track.id}`}>
@@ -136,7 +138,7 @@ export function MusicLeaderboard() {
                     )}
                     {track.style && (
                       <p className="text-xs text-muted-foreground mt-1" data-testid={`text-style-${track.id}`}>
-                        风格：{track.style}
+                        {t.leaderboard.style}：{track.style}
                       </p>
                     )}
                   </div>
