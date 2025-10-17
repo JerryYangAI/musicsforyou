@@ -1,46 +1,53 @@
+import { useQuery } from "@tanstack/react-query";
 import { OrderCard, type OrderStatus } from "./OrderCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Music } from "lucide-react";
-
-//todo: remove mock functionality
-const mockOrders = [
-  {
-    orderId: "M20231016001",
-    description: "流行风格，快乐氛围，包含夏天、海边等元素，时长60秒",
-    status: "completed" as OrderStatus,
-    createdAt: "2024-10-16 14:30",
-    price: 29.9,
-    musicUrl: "https://example.com/music.mp3",
-  },
-  {
-    orderId: "M20231016002",
-    description: "摇滚风格，激昂情绪，包含自由、力量等关键词，时长90秒",
-    status: "processing" as OrderStatus,
-    createdAt: "2024-10-16 15:20",
-    price: 29.9,
-    progress: 65,
-  },
-  {
-    orderId: "M20231016003",
-    description: "爵士风格，浪漫平静，钢琴主导，适合晚餐背景音乐",
-    status: "pending" as OrderStatus,
-    createdAt: "2024-10-16 16:00",
-    price: 29.9,
-  },
-  {
-    orderId: "M20231015001",
-    description: "电子音乐，神秘科技感，适合游戏配乐",
-    status: "completed" as OrderStatus,
-    createdAt: "2024-10-15 10:15",
-    price: 29.9,
-    musicUrl: "https://example.com/music2.mp3",
-  },
-];
+import { Music, Loader2 } from "lucide-react";
+import type { Order } from "@shared/schema";
 
 export function OrderList() {
-  const allOrders = mockOrders;
-  const completedOrders = mockOrders.filter(o => o.status === "completed");
-  const processingOrders = mockOrders.filter(o => o.status === "processing");
+  const { data: orders = [], isLoading } = useQuery<Order[]>({
+    queryKey: ["/api/orders"],
+  });
+
+  const formatDate = (date: Date | string) => {
+    const d = new Date(date);
+    return d.toLocaleString("zh-CN", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const mapOrderStatus = (status: string): OrderStatus => {
+    if (status === "completed") return "completed";
+    if (status === "processing") return "processing";
+    if (status === "failed") return "failed";
+    return "pending";
+  };
+
+  const orderCards = orders.map((order) => ({
+    orderId: order.id,
+    description: order.musicDescription,
+    status: mapOrderStatus(order.orderStatus),
+    createdAt: formatDate(order.createdAt),
+    price: parseFloat(order.amount),
+    progress: order.orderStatus === "processing" ? 50 : undefined,
+    musicUrl: undefined, // Will be populated when music track is linked
+  }));
+
+  const allOrders = orderCards;
+  const completedOrders = orderCards.filter(o => o.status === "completed");
+  const processingOrders = orderCards.filter(o => o.status === "processing");
+
+  if (isLoading) {
+    return (
+      <div className="w-full max-w-6xl mx-auto flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
@@ -49,37 +56,55 @@ export function OrderList() {
         <h2 className="text-2xl font-bold">我的订单</h2>
       </div>
 
-      <Tabs defaultValue="all" className="w-full">
-        <TabsList>
-          <TabsTrigger value="all" data-testid="tab-all-orders">
-            全部订单 ({allOrders.length})
-          </TabsTrigger>
-          <TabsTrigger value="completed" data-testid="tab-completed-orders">
-            已完成 ({completedOrders.length})
-          </TabsTrigger>
-          <TabsTrigger value="processing" data-testid="tab-processing-orders">
-            生成中 ({processingOrders.length})
-          </TabsTrigger>
-        </TabsList>
+      {orders.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">暂无订单</p>
+        </div>
+      ) : (
+        <Tabs defaultValue="all" className="w-full">
+          <TabsList>
+            <TabsTrigger value="all" data-testid="tab-all-orders">
+              全部订单 ({allOrders.length})
+            </TabsTrigger>
+            <TabsTrigger value="completed" data-testid="tab-completed-orders">
+              已完成 ({completedOrders.length})
+            </TabsTrigger>
+            <TabsTrigger value="processing" data-testid="tab-processing-orders">
+              生成中 ({processingOrders.length})
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="all" className="space-y-4 mt-6">
-          {allOrders.map((order) => (
-            <OrderCard key={order.orderId} {...order} />
-          ))}
-        </TabsContent>
+          <TabsContent value="all" className="space-y-4 mt-6">
+            {allOrders.map((order) => (
+              <OrderCard key={order.orderId} {...order} />
+            ))}
+          </TabsContent>
 
-        <TabsContent value="completed" className="space-y-4 mt-6">
-          {completedOrders.map((order) => (
-            <OrderCard key={order.orderId} {...order} />
-          ))}
-        </TabsContent>
+          <TabsContent value="completed" className="space-y-4 mt-6">
+            {completedOrders.length > 0 ? (
+              completedOrders.map((order) => (
+                <OrderCard key={order.orderId} {...order} />
+              ))
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">暂无已完成的订单</p>
+              </div>
+            )}
+          </TabsContent>
 
-        <TabsContent value="processing" className="space-y-4 mt-6">
-          {processingOrders.map((order) => (
-            <OrderCard key={order.orderId} {...order} />
-          ))}
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="processing" className="space-y-4 mt-6">
+            {processingOrders.length > 0 ? (
+              processingOrders.map((order) => (
+                <OrderCard key={order.orderId} {...order} />
+              ))
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">暂无生成中的订单</p>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 }
