@@ -152,4 +152,23 @@ export const en: Translations = {
     download: "Download",
     viewDetails: "View Details",
   },
+
+  profile: {
+    title: "Profile",
+    accountInfo: "Account Information",
+    username: "Username",
+    changePassword: "Change Password",
+    currentPassword: "Current Password",
+    newPassword: "New Password",
+    confirmNewPassword: "Confirm New Password",
+    currentPasswordPlaceholder: "Enter current password",
+    newPasswordPlaceholder: "Enter new password (at least 8 characters)",
+    confirmNewPasswordPlaceholder: "Enter new password again",
+    updatePassword: "Update Password",
+    passwordUpdated: "Password updated successfully",
+    passwordUpdateFailed: "Password update failed",
+    passwordRequired: "Password is required",
+    newPasswordMismatch: "New passwords do not match",
+    incorrectPassword: "Incorrect current password",
+  },
 };

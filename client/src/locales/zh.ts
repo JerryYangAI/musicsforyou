@@ -150,6 +150,25 @@ export const zh = {
     download: "下载",
     viewDetails: "查看详情",
   },
+
+  profile: {
+    title: "个人资料",
+    accountInfo: "账号信息",
+    username: "用户名",
+    changePassword: "修改密码",
+    currentPassword: "当前密码",
+    newPassword: "新密码",
+    confirmNewPassword: "确认新密码",
+    currentPasswordPlaceholder: "请输入当前密码",
+    newPasswordPlaceholder: "请输入新密码（至少8个字符）",
+    confirmNewPasswordPlaceholder: "请再次输入新密码",
+    updatePassword: "更新密码",
+    passwordUpdated: "密码修改成功",
+    passwordUpdateFailed: "密码修改失败",
+    passwordRequired: "请输入密码",
+    newPasswordMismatch: "两次输入的新密码不一致",
+    incorrectPassword: "当前密码错误",
+  },
 };
 
 export type Translations = typeof zh;
