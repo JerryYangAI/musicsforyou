@@ -86,17 +86,17 @@ Preferred communication style: Simple, everyday language.
 ### Authentication & Authorization
 
 **Current Implementation (October 2025)**
-- ✅ Full username/password authentication system implemented
+- ✅ Username/password authentication system (simplified)
 - ✅ Session-based authentication using express-session middleware
 - ✅ Cookie-based credentials with secure httpOnly cookies
-- ✅ Support for both email and phone number registration/login
+- ✅ Username must be unique (enforced by database constraint)
 - ✅ bcrypt password hashing for secure storage
 - ✅ AuthProvider context for global user state management
 - ✅ Protected routes and session persistence
 
 **API Endpoints**
-- POST /api/auth/register - User registration with email or phone
-- POST /api/auth/login - User login with username/email/phone
+- POST /api/auth/register - User registration with username and password
+- POST /api/auth/login - User login with username and password
 - POST /api/auth/logout - User logout and session destruction
 - GET /api/auth/me - Get current authenticated user
 
@@ -152,10 +152,13 @@ Preferred communication style: Simple, everyday language.
 - ✅ Updated AuthResponse type to use string UUID instead of number
 - ✅ Fixed all i18n hard-coding issues (duration units now use translation keys)
 - ✅ Removed theme toggle button, app now defaults to light theme only
-- ✅ Modified registration to auto-generate unique UIDs (no username input required)
 - ✅ Switched from MemStorage to DbStorage for persistent data storage
-- ✅ Email and phone are now independent fields with unique constraints
-- ✅ Username auto-generated with pattern: user_[8 random chars]
+- ✅ **Simplified authentication to username + password only**
+  - Removed email and phone fields from database schema
+  - Username now required and must be unique
+  - Registration/login forms simplified to username + password input
+  - Updated all API endpoints and storage interfaces
+  - All auth tests passing successfully
 
 **Build Process**
 - Client build: Vite bundles React app to dist/public
