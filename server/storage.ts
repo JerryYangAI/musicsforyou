@@ -16,6 +16,43 @@ export class MemStorage implements IStorage {
   constructor() {
     this.users = new Map();
     this.musicTracks = new Map();
+    this.initializeSampleData();
+  }
+
+  private async initializeSampleData() {
+    const sampleTracks = [
+      {
+        title: "夏日海风",
+        description: "清新的海边旋律，带来夏日的惬意感觉",
+        style: "轻音乐, 海洋",
+        audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+        username: "音乐爱好者小王",
+        isPublic: true,
+        userId: null,
+      },
+      {
+        title: "都市节奏",
+        description: "充满活力的电子音乐，展现现代都市生活",
+        style: "电子, 流行",
+        audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+        username: "DJ阿伟",
+        isPublic: true,
+        userId: null,
+      },
+      {
+        title: "梦幻星空",
+        description: "宁静悠远的旋律，仿佛置身星空之下",
+        style: "氛围, 古典",
+        audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+        username: "创作者小李",
+        isPublic: true,
+        userId: null,
+      },
+    ];
+
+    for (const track of sampleTracks) {
+      await this.createMusicTrack(track);
+    }
   }
 
   async getUser(id: string): Promise<User | undefined> {
