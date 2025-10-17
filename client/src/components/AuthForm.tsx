@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Mail, Phone, Lock, User } from "lucide-react";
+import { Lock, User } from "lucide-react";
 import { useLanguage } from "@/components/LanguageProvider";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -14,8 +14,6 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 type AuthResponse = {
   id: string;
   username: string;
-  email: string | null;
-  phone: string | null;
 };
 
 type ErrorResponse = {
@@ -26,16 +24,13 @@ export function AuthForm() {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-
-  const [loginType, setLoginType] = useState<"email" | "phone">("email");
   
   // Login form state
-  const [loginIdentifier, setLoginIdentifier] = useState("");
+  const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   
   // Register form state
-  const [registerEmail, setRegisterEmail] = useState("");
-  const [registerPhone, setRegisterPhone] = useState("");
+  const [registerUsername, setRegisterUsername] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
 
   // Validation errors
@@ -44,7 +39,7 @@ export function AuthForm() {
 
   // Login mutation
   const loginMutation = useMutation({
-    mutationFn: async (data: { identifier: string; password: string }) => {
+    mutationFn: async (data: { username: string; password: string }) => {
       const response = await apiRequest("POST", "/api/auth/login", data);
       return response.json();
     },
@@ -72,8 +67,7 @@ export function AuthForm() {
   // Register mutation
   const registerMutation = useMutation({
     mutationFn: async (data: {
-      email?: string;
-      phone?: string;
+      username: string;
       password: string;
     }) => {
       const response = await apiRequest("POST", "/api/auth/register", data);
@@ -102,7 +96,7 @@ export function AuthForm() {
     setLoginError("");
 
     // Validation
-    if (!loginIdentifier || !loginPassword) {
+    if (!loginUsername || !loginPassword) {
       setLoginError(t.auth.invalidInput);
       return;
     }
@@ -113,7 +107,7 @@ export function AuthForm() {
     }
 
     loginMutation.mutate({
-      identifier: loginIdentifier,
+      username: loginUsername,
       password: loginPassword,
     });
   };
@@ -122,17 +116,7 @@ export function AuthForm() {
     setRegisterError("");
 
     // Validation
-    if (!registerPassword) {
-      setRegisterError(t.auth.invalidInput);
-      return;
-    }
-
-    if (loginType === "email" && !registerEmail) {
-      setRegisterError(t.auth.invalidInput);
-      return;
-    }
-
-    if (loginType === "phone" && !registerPhone) {
+    if (!registerUsername || !registerPassword) {
       setRegisterError(t.auth.invalidInput);
       return;
     }
@@ -143,8 +127,7 @@ export function AuthForm() {
     }
 
     registerMutation.mutate({
-      email: loginType === "email" ? registerEmail : undefined,
-      phone: loginType === "phone" ? registerPhone : undefined,
+      username: registerUsername,
       password: registerPassword,
     });
   };
@@ -167,41 +150,18 @@ export function AuthForm() {
           </TabsList>
           
           <TabsContent value="login" className="space-y-4 mt-4">
-            <div className="flex gap-2 mb-4">
-              <Button
-                variant={loginType === "email" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setLoginType("email")}
-                data-testid="button-email-login"
-              >
-                <Mail className="w-4 h-4 mr-2" />
-                {t.auth.email}
-              </Button>
-              <Button
-                variant={loginType === "phone" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setLoginType("phone")}
-                data-testid="button-phone-login"
-              >
-                <Phone className="w-4 h-4 mr-2" />
-                {t.auth.phone}
-              </Button>
-            </div>
-
             <div className="space-y-2">
-              <Label htmlFor="login-identifier">
-                {loginType === "email" ? t.auth.emailAddress : t.auth.phoneNumber}
-              </Label>
+              <Label htmlFor="login-username">{t.auth.username}</Label>
               <Input
-                id="login-identifier"
-                type={loginType === "email" ? "email" : "tel"}
-                placeholder={loginType === "email" ? t.auth.emailPlaceholder : t.auth.phonePlaceholder}
-                value={loginIdentifier}
+                id="login-username"
+                type="text"
+                placeholder={t.auth.usernamePlaceholder}
+                value={loginUsername}
                 onChange={(e) => {
-                  setLoginIdentifier(e.target.value);
+                  setLoginUsername(e.target.value);
                   setLoginError("");
                 }}
-                data-testid={loginType === "email" ? "input-login-email" : "input-login-phone"}
+                data-testid="input-login-username"
               />
             </div>
 
@@ -244,58 +204,20 @@ export function AuthForm() {
           </TabsContent>
 
           <TabsContent value="register" className="space-y-4 mt-4">
-            <div className="flex gap-2 mb-4">
-              <Button
-                variant={loginType === "email" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setLoginType("email")}
-                data-testid="button-email-register"
-              >
-                <Mail className="w-4 h-4 mr-2" />
-                {t.auth.email}
-              </Button>
-              <Button
-                variant={loginType === "phone" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setLoginType("phone")}
-                data-testid="button-phone-register"
-              >
-                <Phone className="w-4 h-4 mr-2" />
-                {t.auth.phone}
-              </Button>
+            <div className="space-y-2">
+              <Label htmlFor="register-username">{t.auth.username}</Label>
+              <Input
+                id="register-username"
+                type="text"
+                placeholder={t.auth.usernamePlaceholder}
+                value={registerUsername}
+                onChange={(e) => {
+                  setRegisterUsername(e.target.value);
+                  setRegisterError("");
+                }}
+                data-testid="input-register-username"
+              />
             </div>
-
-            {loginType === "email" ? (
-              <div className="space-y-2">
-                <Label htmlFor="register-email">{t.auth.emailAddress}</Label>
-                <Input
-                  id="register-email"
-                  type="email"
-                  placeholder={t.auth.emailPlaceholder}
-                  value={registerEmail}
-                  onChange={(e) => {
-                    setRegisterEmail(e.target.value);
-                    setRegisterError("");
-                  }}
-                  data-testid="input-register-email"
-                />
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <Label htmlFor="register-phone">{t.auth.phoneNumber}</Label>
-                <Input
-                  id="register-phone"
-                  type="tel"
-                  placeholder={t.auth.phonePlaceholder}
-                  value={registerPhone}
-                  onChange={(e) => {
-                    setRegisterPhone(e.target.value);
-                    setRegisterError("");
-                  }}
-                  data-testid="input-register-phone"
-                />
-              </div>
-            )}
 
             <div className="space-y-2">
               <Label htmlFor="register-password">{t.auth.setPassword}</Label>
@@ -328,7 +250,7 @@ export function AuthForm() {
                 <>{t.common.loading}</>
               ) : (
                 <>
-                  <Lock className="w-4 h-4 mr-2" />
+                  <User className="w-4 h-4 mr-2" />
                   {t.auth.registerButton}
                 </>
               )}

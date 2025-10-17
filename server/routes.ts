@@ -17,38 +17,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Registration endpoint
   app.post("/api/auth/register", async (req, res) => {
     try {
-      const { email, phone, password } = req.body;
+      const { username, password } = req.body;
 
       // Validation
-      if (!password) {
-        return res.status(400).json({ error: "Password required" });
+      if (!username || !password) {
+        return res.status(400).json({ error: "Username and password are required" });
       }
 
-      if (!email && !phone) {
-        return res.status(400).json({ error: "Email or phone is required" });
-      }
-
-      if (email) {
-        const existingEmail = await storage.getUserByEmail(email);
-        if (existingEmail) {
-          return res.status(400).json({ error: "Email already registered" });
-        }
-      }
-
-      if (phone) {
-        const existingPhone = await storage.getUserByPhone(phone);
-        if (existingPhone) {
-          return res.status(400).json({ error: "Phone already registered" });
-        }
+      // Check if username already exists
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ error: "Username already taken" });
       }
 
       // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Create user (username will be auto-generated)
+      // Create user
       const user = await storage.createUser({
-        email: email || undefined,
-        phone: phone || undefined,
+        username,
         password: hashedPassword,
       });
 
@@ -58,8 +45,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ 
         id: user.id,
         username: user.username,
-        email: user.email,
-        phone: user.phone,
       });
     } catch (error) {
       console.error("Registration error:", error);
@@ -70,20 +55,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Login endpoint
   app.post("/api/auth/login", async (req, res) => {
     try {
-      const { identifier, password } = req.body;
+      const { username, password } = req.body;
 
-      if (!identifier || !password) {
-        return res.status(400).json({ error: "Identifier and password required" });
+      if (!username || !password) {
+        return res.status(400).json({ error: "Username and password are required" });
       }
 
-      // Find user by username, email, or phone
-      let user = await storage.getUserByUsername(identifier);
-      if (!user) {
-        user = await storage.getUserByEmail(identifier);
-      }
-      if (!user) {
-        user = await storage.getUserByPhone(identifier);
-      }
+      // Find user by username
+      const user = await storage.getUserByUsername(username);
 
       if (!user) {
         return res.status(401).json({ error: "Invalid credentials" });
@@ -101,8 +80,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         id: user.id,
         username: user.username,
-        email: user.email,
-        phone: user.phone,
       });
     } catch (error) {
       console.error("Login error:", error);
@@ -135,8 +112,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         id: user.id,
         username: user.username,
-        email: user.email,
-        phone: user.phone,
       });
     } catch (error) {
       console.error("Get user error:", error);
