@@ -140,6 +140,18 @@ Preferred communication style: Simple, everyday language.
 
 ### Build & Deployment
 
+**Recent Updates (October 2025)**
+- ✅ Implemented session-based authentication with express-session middleware
+- ✅ Fixed critical session initialization bug in server/index.ts
+- ✅ Created music customization form with full i18n support
+- ✅ Added comprehensive form validation (mood selection, description length)
+- ✅ Implemented orders table schema with payment tracking fields
+- ✅ Added Stripe payment intent endpoint at POST /api/create-payment-intent
+- ✅ All validation errors displayed with proper localized messages
+- ✅ Form data properly stored in sessionStorage for payment flow navigation
+- ✅ Updated AuthResponse type to use string UUID instead of number
+- ✅ Fixed all i18n hard-coding issues (duration units now use translation keys)
+
 **Build Process**
 - Client build: Vite bundles React app to dist/public
 - Server build: esbuild bundles Express server to dist/index.js
@@ -148,6 +160,8 @@ Preferred communication style: Simple, everyday language.
 
 **Environment Configuration**
 - DATABASE_URL required for PostgreSQL connection
+- STRIPE_SECRET_KEY and VITE_STRIPE_PUBLIC_KEY for payment processing
+- SESSION_SECRET for session encryption
 - Environment-specific paths and settings
 - Production-optimized builds with code splitting
 - Asset optimization and minification
