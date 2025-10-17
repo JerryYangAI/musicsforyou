@@ -6,7 +6,7 @@ export function HeroSection() {
     <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden">
       {/* Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary via-chart-2 to-primary opacity-90" />
-      
+
       {/* Animated Sound Wave Pattern */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute inset-0 flex items-center justify-center gap-2">
@@ -30,7 +30,7 @@ export function HeroSection() {
           <Sparkles className="w-4 h-4" />
           <span className="text-sm font-medium">AI-Powered Music Creation</span>
         </div>
-        
+
         <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight">
           Create Your
           <br />
@@ -38,9 +38,9 @@ export function HeroSection() {
             Own Beat
           </span>
         </h1>
-        
+
         <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">
-          从简单的描述到完整的音乐作品，让AI为您量身定制独一无二的音乐
+          AI 定制专属音乐，一句话就能成，给朋友的独一份礼物！
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -65,14 +65,16 @@ export function HeroSection() {
 
         {/* Feature Pills */}
         <div className="flex flex-wrap gap-3 justify-center mt-12">
-          {["多种音乐风格", "即时生成", "高品质输出", "安全支付"].map((feature) => (
-            <div
-              key={feature}
-              className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm text-white border border-white/20"
-            >
-              {feature}
-            </div>
-          ))}
+          {["多种音乐风格", "即时生成", "高品质输出", "安全支付"].map(
+            (feature) => (
+              <div
+                key={feature}
+                className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm text-white border border-white/20"
+              >
+                {feature}
+              </div>
+            ),
+          )}
         </div>
       </div>
     </section>

@@ -1,0 +1,115 @@
+export const zh = {
+  common: {
+    loading: "加载中...",
+    error: "错误",
+    success: "成功",
+    cancel: "取消",
+    confirm: "确认",
+    save: "保存",
+    delete: "删除",
+    edit: "编辑",
+    create: "创建",
+    search: "搜索",
+  },
+  
+  header: {
+    home: "首页",
+    create: "创作音乐",
+    orders: "我的订单",
+    login: "登录",
+    logout: "登出",
+    signup: "注册",
+  },
+
+  hero: {
+    title: "AI音乐定制平台",
+    subtitle: "用AI创造您的专属音乐",
+    description: "只需描述您想要的音乐风格，AI即可为您生成独一无二的音乐作品",
+    getStarted: "开始创作",
+    learnMore: "了解更多",
+  },
+
+  features: {
+    title: "为什么选择我们",
+    aiPowered: "AI驱动",
+    aiPoweredDesc: "强大的AI音乐生成技术，创造独特作品",
+    customization: "个性定制",
+    customizationDesc: "根据您的需求定制音乐风格和情绪",
+    fastDelivery: "快速交付",
+    fastDeliveryDesc: "高效的生成流程，快速获得您的音乐",
+    highQuality: "高品质",
+    highQualityDesc: "专业级音质，满足各种使用场景",
+  },
+
+  leaderboard: {
+    title: "音乐试听榜单",
+    subtitle: "发现其他用户创作的精彩音乐，每首支持试听10秒",
+    noMusic: "暂无公开音乐作品",
+    creator: "创作者",
+    style: "风格",
+  },
+
+  cta: {
+    title: "准备好创作您的音乐了吗？",
+    subtitle: "只需简单几步，AI即可为您生成专属音乐作品",
+    startNow: "立即开始创作",
+  },
+
+  auth: {
+    login: "登录",
+    signup: "注册",
+    username: "用户名",
+    password: "密码",
+    phone: "手机号",
+    email: "邮箱",
+    loginTitle: "欢迎回来",
+    loginSubtitle: "登录您的账户开始创作",
+    signupTitle: "创建账户",
+    signupSubtitle: "注册账户开始您的音乐创作之旅",
+    noAccount: "还没有账户？",
+    hasAccount: "已有账户？",
+    loginMethod: "登录方式",
+    phoneLogin: "手机登录",
+    emailLogin: "邮箱登录",
+  },
+
+  music: {
+    title: "创作音乐",
+    description: "描述您想要的音乐",
+    descriptionPlaceholder: "例如：轻快的钢琴曲，适合早晨听...",
+    style: "音乐风格",
+    stylePlaceholder: "例如：古典、流行、电子...",
+    mood: "情绪氛围",
+    moodPlaceholder: "例如：欢快、悲伤、平静...",
+    duration: "时长",
+    generate: "生成音乐",
+    generatingTips: "AI正在为您创作音乐，请稍候...",
+  },
+
+  payment: {
+    title: "选择支付方式",
+    selectMethod: "请选择支付方式",
+    stripe: "信用卡支付",
+    wechat: "微信支付",
+    alipay: "支付宝",
+    amount: "金额",
+    pay: "立即支付",
+    processing: "处理中...",
+    success: "支付成功",
+    failed: "支付失败",
+  },
+
+  orders: {
+    title: "我的订单",
+    noOrders: "暂无订单",
+    status: "状态",
+    pending: "待处理",
+    processing: "生成中",
+    completed: "已完成",
+    failed: "失败",
+    download: "下载",
+    viewDetails: "查看详情",
+  },
+};
+
+export type Translations = typeof zh;
