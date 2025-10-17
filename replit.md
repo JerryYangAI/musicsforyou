@@ -151,6 +151,11 @@ Preferred communication style: Simple, everyday language.
 - ✅ Form data properly stored in sessionStorage for payment flow navigation
 - ✅ Updated AuthResponse type to use string UUID instead of number
 - ✅ Fixed all i18n hard-coding issues (duration units now use translation keys)
+- ✅ Removed theme toggle button, app now defaults to light theme only
+- ✅ Modified registration to auto-generate unique UIDs (no username input required)
+- ✅ Switched from MemStorage to DbStorage for persistent data storage
+- ✅ Email and phone are now independent fields with unique constraints
+- ✅ Username auto-generated with pattern: user_[8 random chars]
 
 **Build Process**
 - Client build: Vite bundles React app to dist/public

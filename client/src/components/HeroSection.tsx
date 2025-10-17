@@ -1,10 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { useLanguage } from "./LanguageProvider";
 import { Music, Sparkles, Zap } from "lucide-react";
 
 export function HeroSection() {
-  const { t } = useLanguage();
-  
   return (
     <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden">
       {/* Gradient Background */}
@@ -31,15 +28,19 @@ export function HeroSection() {
       <div className="relative z-10 container mx-auto px-6 py-20 text-center">
         <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6 text-white">
           <Sparkles className="w-4 h-4" />
-          <span className="text-sm font-medium">{t.hero.title}</span>
+          <span className="text-sm font-medium">AI-Powered Music Creation</span>
         </div>
 
         <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight">
-          {t.hero.subtitle}
+          Create Your
+          <br />
+          <span className="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-transparent">
+            Own Beat
+          </span>
         </h1>
 
         <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">
-          {t.hero.description}
+          AI 定制专属音乐，一句话就能成，给朋友的独一份礼物！
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -49,7 +50,7 @@ export function HeroSection() {
             data-testid="button-create-music"
           >
             <Music className="w-5 h-5 mr-2" />
-            {t.hero.getStarted}
+            开始创作
           </Button>
           <Button
             size="lg"
@@ -58,8 +59,22 @@ export function HeroSection() {
             data-testid="button-view-examples"
           >
             <Zap className="w-5 h-5 mr-2" />
-            {t.hero.learnMore}
+            查看示例
           </Button>
+        </div>
+
+        {/* Feature Pills */}
+        <div className="flex flex-wrap gap-3 justify-center mt-12">
+          {["多种音乐风格", "即时生成", "高品质输出", "安全支付"].map(
+            (feature) => (
+              <div
+                key={feature}
+                className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm text-white border border-white/20"
+              >
+                {feature}
+              </div>
+            ),
+          )}
         </div>
       </div>
     </section>

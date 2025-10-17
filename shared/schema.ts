@@ -5,15 +5,16 @@ import { z } from "zod";
 
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
-  email: text("email"),
-  phone: text("phone"),
+  username: text("username").notNull().unique().default(sql`'user_' || substr(md5(random()::text), 1, 8)`),
+  email: text("email").unique(),
+  phone: text("phone").unique(),
   password: text("password").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
+  username: true,
   createdAt: true,
 });
 

@@ -34,11 +34,9 @@ export function AuthForm() {
   const [loginPassword, setLoginPassword] = useState("");
   
   // Register form state
-  const [registerUsername, setRegisterUsername] = useState("");
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerPhone, setRegisterPhone] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
-  const [registerConfirmPassword, setRegisterConfirmPassword] = useState("");
 
   // Validation errors
   const [loginError, setLoginError] = useState("");
@@ -74,11 +72,9 @@ export function AuthForm() {
   // Register mutation
   const registerMutation = useMutation({
     mutationFn: async (data: {
-      username: string;
       email?: string;
       phone?: string;
       password: string;
-      confirmPassword: string;
     }) => {
       const response = await apiRequest("POST", "/api/auth/register", data);
       return response.json();
@@ -126,7 +122,7 @@ export function AuthForm() {
     setRegisterError("");
 
     // Validation
-    if (!registerUsername || !registerPassword || !registerConfirmPassword) {
+    if (!registerPassword) {
       setRegisterError(t.auth.invalidInput);
       return;
     }
@@ -146,17 +142,10 @@ export function AuthForm() {
       return;
     }
 
-    if (registerPassword !== registerConfirmPassword) {
-      setRegisterError(t.auth.passwordMismatch);
-      return;
-    }
-
     registerMutation.mutate({
-      username: registerUsername,
       email: loginType === "email" ? registerEmail : undefined,
       phone: loginType === "phone" ? registerPhone : undefined,
       password: registerPassword,
-      confirmPassword: registerConfirmPassword,
     });
   };
 
@@ -276,21 +265,6 @@ export function AuthForm() {
               </Button>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="register-username">{t.auth.username}</Label>
-              <Input
-                id="register-username"
-                type="text"
-                placeholder={t.auth.usernamePlaceholder}
-                value={registerUsername}
-                onChange={(e) => {
-                  setRegisterUsername(e.target.value);
-                  setRegisterError("");
-                }}
-                data-testid="input-register-username"
-              />
-            </div>
-
             {loginType === "email" ? (
               <div className="space-y-2">
                 <Label htmlFor="register-email">{t.auth.emailAddress}</Label>
@@ -335,21 +309,6 @@ export function AuthForm() {
                   setRegisterError("");
                 }}
                 data-testid="input-register-password"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="register-confirm-password">{t.auth.confirmPassword}</Label>
-              <Input
-                id="register-confirm-password"
-                type="password"
-                placeholder={t.auth.passwordPlaceholder}
-                value={registerConfirmPassword}
-                onChange={(e) => {
-                  setRegisterConfirmPassword(e.target.value);
-                  setRegisterError("");
-                }}
-                data-testid="input-register-confirm-password"
               />
             </div>
 

@@ -9,7 +9,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
 }
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2024-10-28.acacia",
+  apiVersion: "2025-09-30.clover",
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -17,21 +17,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Registration endpoint
   app.post("/api/auth/register", async (req, res) => {
     try {
-      const { username, email, phone, password, confirmPassword } = req.body;
+      const { email, phone, password } = req.body;
 
       // Validation
-      if (!username || !password || confirmPassword !== password) {
-        return res.status(400).json({ error: "Invalid input" });
+      if (!password) {
+        return res.status(400).json({ error: "Password required" });
       }
 
       if (!email && !phone) {
         return res.status(400).json({ error: "Email or phone is required" });
-      }
-
-      // Check if user already exists
-      const existingUser = await storage.getUserByUsername(username);
-      if (existingUser) {
-        return res.status(400).json({ error: "Username already exists" });
       }
 
       if (email) {
@@ -51,9 +45,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Create user
+      // Create user (username will be auto-generated)
       const user = await storage.createUser({
-        username,
         email: email || undefined,
         phone: phone || undefined,
         password: hashedPassword,

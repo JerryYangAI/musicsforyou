@@ -1,5 +1,7 @@
-import { type User, type InsertUser, type MusicTrack, type InsertMusicTrack } from "@shared/schema";
+import { type User, type InsertUser, type MusicTrack, type InsertMusicTrack, users, musicTracks } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { db } from "./db";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -81,9 +83,11 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
+    // Generate username similar to database default: user_ + 8 random characters
+    const username = 'user_' + randomUUID().substring(0, 8);
     const user: User = {
       id,
-      username: insertUser.username,
+      username,
       email: insertUser.email ?? null,
       phone: insertUser.phone ?? null,
       password: insertUser.password,
@@ -119,4 +123,48 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DbStorage implements IStorage {
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    if (!email) return undefined;
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async getUserByPhone(phone: string): Promise<User | undefined> {
+    if (!phone) return undefined;
+    const [user] = await db.select().from(users).where(eq(users.phone, phone));
+    return user;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(insertUser).returning();
+    return user;
+  }
+
+  async getPublicMusicTracks(limit: number = 10): Promise<MusicTrack[]> {
+    const tracks = await db
+      .select()
+      .from(musicTracks)
+      .where(eq(musicTracks.isPublic, true))
+      .orderBy(desc(musicTracks.createdAt))
+      .limit(limit);
+    return tracks;
+  }
+
+  async createMusicTrack(insertTrack: InsertMusicTrack): Promise<MusicTrack> {
+    const [track] = await db.insert(musicTracks).values(insertTrack).returning();
+    return track;
+  }
+}
+
+export const storage = new DbStorage();
