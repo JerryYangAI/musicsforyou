@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { LanguageToggle } from "./LanguageToggle";
 import { useLanguage } from "./LanguageProvider";
 import { useAuth } from "./AuthProvider";
-import { Music, User, LogOut } from "lucide-react";
+import { Music, User, LogOut, Shield } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
 export function Header() {
@@ -42,6 +42,12 @@ export function Header() {
           <Link href="/orders" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors" data-testid="link-orders">
             {t.header.orders}
           </Link>
+          {user?.isAdmin && (
+            <Link href="/admin" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1" data-testid="link-admin">
+              <Shield className="h-4 w-4" />
+              {t.header.admin}
+            </Link>
+          )}
         </nav>
 
         {/* Actions */}
