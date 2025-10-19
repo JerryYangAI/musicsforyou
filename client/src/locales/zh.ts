@@ -14,9 +14,9 @@ export const zh = {
   },
   
   header: {
-    brandName: "AI音乐工坊",
+    brandName: "音乐定制工坊",
     home: "首页",
-    create: "创作音乐",
+    create: "定制音乐",
     orders: "我的订单",
     login: "登录",
     logout: "登出",
@@ -24,42 +24,42 @@ export const zh = {
   },
 
   hero: {
-    title: "AI音乐定制平台",
-    subtitle: "用AI创造您的专属音乐",
-    description: "只需描述您想要的音乐风格，AI即可为您生成独一无二的音乐作品",
-    getStarted: "开始创作",
+    title: "专业音乐定制平台",
+    subtitle: "为您打造专属的音乐作品",
+    description: "只需描述您的需求，我们的专业团队将为您创作独一无二的音乐作品",
+    getStarted: "开始定制",
     learnMore: "了解更多",
   },
 
   features: {
     title: "为什么选择我们",
-    aiPowered: "AI驱动",
-    aiPoweredDesc: "强大的AI音乐生成技术，创造独特作品",
+    professional: "专业团队",
+    professionalDesc: "经验丰富的音乐制作团队，为您打造高品质作品",
     customization: "个性定制",
     customizationDesc: "根据您的需求定制音乐风格和情绪",
     fastDelivery: "快速交付",
-    fastDeliveryDesc: "高效的生成流程，快速获得您的音乐",
+    fastDeliveryDesc: "高效的制作流程，快速交付您的音乐",
     highQuality: "高品质",
     highQualityDesc: "专业级音质，满足各种使用场景",
   },
 
   leaderboard: {
     title: "音乐试听榜单",
-    subtitle: "发现其他用户创作的精彩音乐，每首支持试听10秒",
+    subtitle: "发现其他用户定制的精彩音乐，每首支持试听10秒",
     noMusic: "暂无公开音乐作品",
-    creator: "创作者",
+    creator: "定制者",
     style: "风格",
   },
 
   cta: {
-    title: "准备好创作您的音乐了吗？",
-    subtitle: "只需简单几步，AI即可为您生成专属音乐作品",
-    startNow: "立即开始创作",
+    title: "准备好定制您的音乐了吗？",
+    subtitle: "只需简单几步，我们的团队即可为您打造专属音乐作品",
+    startNow: "立即开始定制",
   },
 
   auth: {
     welcome: "欢迎回来",
-    subtitle: "登录或注册开始创作您的音乐",
+    subtitle: "登录或注册开始定制您的音乐",
     login: "登录",
     register: "注册",
     email: "邮箱",
@@ -85,7 +85,7 @@ export const zh = {
   },
 
   music: {
-    title: "创作音乐",
+    title: "定制音乐",
     description: "描述您想要的音乐",
     descriptionPlaceholder: "例如：轻快的钢琴曲，适合早晨听...",
     style: "音乐风格",
@@ -94,8 +94,8 @@ export const zh = {
     moodPlaceholder: "例如：欢快、悲伤、平静...",
     duration: "时长",
     durationUnit: "秒",
-    generate: "生成音乐",
-    generatingTips: "AI正在为您创作音乐，请稍候...",
+    generate: "提交定制",
+    generatingTips: "正在提交您的定制需求，请稍候...",
     customizeTitle: "定制您的音乐",
     customizeDescription: "描述您想要的音乐风格、情绪和特点",
     moodMultiSelect: "情绪氛围（可多选）",

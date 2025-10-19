@@ -7,6 +7,7 @@ export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  isAdmin: boolean("is_admin").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -49,7 +50,8 @@ export const orders = pgTable("orders", {
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   paymentMethod: text("payment_method").notNull(), // "stripe", "wechat", "alipay"
   paymentStatus: text("payment_status").default("pending").notNull(), // "pending", "paid", "failed"
-  orderStatus: text("order_status").default("pending").notNull(), // "pending", "processing", "completed", "failed"
+  orderStatus: text("order_status").default("pending").notNull(), // "pending", "processing", "completed", "failed", "cancelled", "closed"
+  musicFileUrl: text("music_file_url"), // URL of uploaded music file
   musicTrackId: varchar("music_track_id").references(() => musicTracks.id),
   stripePaymentIntentId: text("stripe_payment_intent_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

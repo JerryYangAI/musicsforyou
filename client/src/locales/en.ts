@@ -16,9 +16,9 @@ export const en: Translations = {
   },
   
   header: {
-    brandName: "AI Music Studio",
+    brandName: "Music Custom Studio",
     home: "Home",
-    create: "Create Music",
+    create: "Custom Music",
     orders: "My Orders",
     login: "Login",
     logout: "Logout",
@@ -26,42 +26,42 @@ export const en: Translations = {
   },
 
   hero: {
-    title: "AI Music Customization Platform",
-    subtitle: "Create Your Own Music with AI",
-    description: "Just describe the music style you want, and AI will generate unique music for you",
-    getStarted: "Get Started",
+    title: "Professional Music Customization Platform",
+    subtitle: "Crafting Your Unique Musical Masterpiece",
+    description: "Simply describe your needs, and our professional team will create unique music for you",
+    getStarted: "Get Customization",
     learnMore: "Learn More",
   },
 
   features: {
     title: "Why Choose Us",
-    aiPowered: "AI Powered",
-    aiPoweredDesc: "Advanced AI music generation technology for unique creations",
+    professional: "Professional Team",
+    professionalDesc: "Experienced music production team for high-quality creations",
     customization: "Customization",
     customizationDesc: "Tailor music styles and moods to your needs",
     fastDelivery: "Fast Delivery",
-    fastDeliveryDesc: "Efficient generation process for quick results",
+    fastDeliveryDesc: "Efficient production process for quick delivery",
     highQuality: "High Quality",
     highQualityDesc: "Professional-grade audio for all scenarios",
   },
 
   leaderboard: {
     title: "Music Leaderboard",
-    subtitle: "Discover amazing music created by others, with 10-second previews",
+    subtitle: "Discover amazing music customized by others, with 10-second previews",
     noMusic: "No public music available",
-    creator: "Creator",
+    creator: "Customer",
     style: "Style",
   },
 
   cta: {
-    title: "Ready to Create Your Music?",
-    subtitle: "In just a few steps, AI will generate your custom music",
-    startNow: "Start Now",
+    title: "Ready to Customize Your Music?",
+    subtitle: "In just a few steps, our team will create your custom music",
+    startNow: "Start Customization",
   },
 
   auth: {
     welcome: "Welcome Back",
-    subtitle: "Login or register to start creating your music",
+    subtitle: "Login or register to start customizing your music",
     login: "Login",
     register: "Register",
     email: "Email",
@@ -87,7 +87,7 @@ export const en: Translations = {
   },
 
   music: {
-    title: "Create Music",
+    title: "Customize Music",
     description: "Describe the music you want",
     descriptionPlaceholder: "e.g., Light piano music, perfect for morning...",
     style: "Music Style",
@@ -96,8 +96,8 @@ export const en: Translations = {
     moodPlaceholder: "e.g., Happy, Sad, Calm...",
     duration: "Duration",
     durationUnit: "s",
-    generate: "Generate Music",
-    generatingTips: "AI is creating your music, please wait...",
+    generate: "Submit Customization",
+    generatingTips: "Submitting your customization request, please wait...",
     customizeTitle: "Customize Your Music",
     customizeDescription: "Describe the music style, mood, and characteristics you want",
     moodMultiSelect: "Mood (Multiple Select)",
