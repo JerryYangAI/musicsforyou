@@ -11,6 +11,18 @@ export interface IStorage {
   getPublicMusicTracks(limit?: number): Promise<MusicTrack[]>;
   createMusicTrack(track: InsertMusicTrack): Promise<MusicTrack>;
   getUserOrders(userId: string): Promise<Order[]>;
+  // Admin methods
+  getAllOrders(): Promise<Order[]>;
+  updateOrderMusicFile(orderId: string, musicFileUrl: string): Promise<void>;
+  updateOrderStatus(orderId: string, status: string): Promise<void>;
+  getOrderStats(): Promise<{
+    total: number;
+    pending: number;
+    processing: number;
+    completed: number;
+    cancelled: number;
+    failed: number;
+  }>;
 }
 
 export class MemStorage implements IStorage {
@@ -116,6 +128,36 @@ export class MemStorage implements IStorage {
   async getUserOrders(userId: string): Promise<Order[]> {
     return [];
   }
+
+  async getAllOrders(): Promise<Order[]> {
+    return [];
+  }
+
+  async updateOrderMusicFile(orderId: string, musicFileUrl: string): Promise<void> {
+    // Not implemented for MemStorage
+  }
+
+  async updateOrderStatus(orderId: string, status: string): Promise<void> {
+    // Not implemented for MemStorage
+  }
+
+  async getOrderStats(): Promise<{
+    total: number;
+    pending: number;
+    processing: number;
+    completed: number;
+    cancelled: number;
+    failed: number;
+  }> {
+    return {
+      total: 0,
+      pending: 0,
+      processing: 0,
+      completed: 0,
+      cancelled: 0,
+      failed: 0,
+    };
+  }
 }
 
 export class DbStorage implements IStorage {
@@ -163,6 +205,56 @@ export class DbStorage implements IStorage {
       .where(eq(orders.userId, userId))
       .orderBy(desc(orders.createdAt));
     return userOrders;
+  }
+
+  // Admin methods implementation
+  async getAllOrders(): Promise<Order[]> {
+    const allOrders = await db
+      .select()
+      .from(orders)
+      .orderBy(desc(orders.createdAt));
+    return allOrders;
+  }
+
+  async updateOrderMusicFile(orderId: string, musicFileUrl: string): Promise<void> {
+    await db
+      .update(orders)
+      .set({ 
+        musicFileUrl,
+        orderStatus: "completed",
+        updatedAt: new Date()
+      })
+      .where(eq(orders.id, orderId));
+  }
+
+  async updateOrderStatus(orderId: string, status: string): Promise<void> {
+    await db
+      .update(orders)
+      .set({ 
+        orderStatus: status,
+        updatedAt: new Date()
+      })
+      .where(eq(orders.id, orderId));
+  }
+
+  async getOrderStats(): Promise<{
+    total: number;
+    pending: number;
+    processing: number;
+    completed: number;
+    cancelled: number;
+    failed: number;
+  }> {
+    const allOrders = await db.select().from(orders);
+    
+    return {
+      total: allOrders.length,
+      pending: allOrders.filter(o => o.orderStatus === "pending").length,
+      processing: allOrders.filter(o => o.orderStatus === "processing").length,
+      completed: allOrders.filter(o => o.orderStatus === "completed").length,
+      cancelled: allOrders.filter(o => o.orderStatus === "cancelled").length,
+      failed: allOrders.filter(o => o.orderStatus === "failed").length,
+    };
   }
 }
 

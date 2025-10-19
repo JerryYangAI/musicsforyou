@@ -12,6 +12,20 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2025-09-30.clover",
 });
 
+// Admin middleware
+async function requireAdmin(req: any, res: any, next: any) {
+  if (!req.session.userId) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+  
+  const user = await storage.getUser(req.session.userId);
+  if (!user || !user.isAdmin) {
+    return res.status(403).json({ error: "Admin access required" });
+  }
+  
+  next();
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   
   // Registration endpoint
@@ -190,6 +204,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching user orders:", error);
       res.status(500).json({ error: "Failed to fetch orders" });
+    }
+  });
+
+  // Admin: Get all orders
+  app.get("/api/admin/orders", requireAdmin, async (req, res) => {
+    try {
+      const orders = await storage.getAllOrders();
+      res.json(orders);
+    } catch (error) {
+      console.error("Error fetching all orders:", error);
+      res.status(500).json({ error: "Failed to fetch orders" });
+    }
+  });
+
+  // Admin: Upload music file to order
+  app.put("/api/admin/orders/:id/music", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { musicFileUrl } = req.body;
+
+      if (!musicFileUrl) {
+        return res.status(400).json({ error: "Music file URL is required" });
+      }
+
+      await storage.updateOrderMusicFile(id, musicFileUrl);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error uploading music:", error);
+      res.status(500).json({ error: "Failed to upload music" });
+    }
+  });
+
+  // Admin: Update order status
+  app.put("/api/admin/orders/:id/status", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+
+      const validStatuses = ["pending", "processing", "completed", "failed", "cancelled", "closed"];
+      if (!status || !validStatuses.includes(status)) {
+        return res.status(400).json({ error: "Invalid status" });
+      }
+
+      await storage.updateOrderStatus(id, status);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      res.status(500).json({ error: "Failed to update status" });
+    }
+  });
+
+  // Admin: Get order statistics
+  app.get("/api/admin/stats", requireAdmin, async (req, res) => {
+    try {
+      const stats = await storage.getOrderStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+      res.status(500).json({ error: "Failed to fetch stats" });
     }
   });
   
