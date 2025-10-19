@@ -16,7 +16,7 @@ export const en: Translations = {
   },
   
   header: {
-    brandName: "Music Custom Studio",
+    brandName: "Your Melody",
     home: "Home",
     create: "Custom Music",
     orders: "My Orders",
@@ -28,7 +28,7 @@ export const en: Translations = {
 
   hero: {
     title: "Professional Music Customization Platform",
-    subtitle: "Crafting Your Unique Musical Masterpiece",
+    subtitle: "Custom Music Surprises, Play the Melody of Your Heart",
     description: "Simply describe your needs, and our professional team will create unique music for you",
     getStarted: "Get Customization",
     learnMore: "Learn More",
@@ -109,6 +109,13 @@ export const en: Translations = {
     detailPlaceholder: "Describe music details like instruments, rhythm...",
     characterCount: "characters",
     continuePay: "Continue to Payment",
+    lyrics: "Lyrics/Keywords",
+    lyricsPlaceholder: "Enter keywords or themes, our team will create complete lyrics for you...",
+    songTitle: "Song Title (Optional)",
+    songTitlePlaceholder: "Give your music a name...",
+    voiceType: "Voice Type",
+    maleVoice: "Male Voice",
+    femaleVoice: "Female Voice",
     styles: {
       pop: "Pop",
       rock: "Rock",
@@ -200,5 +207,43 @@ export const en: Translations = {
     newPasswordMismatch: "New passwords do not match",
     incorrectPassword: "Incorrect current password",
     samePasswordError: "New password must be different from current password",
+  },
+
+  footer: {
+    aboutUs: "About Us",
+    contactUs: "Contact Us",
+    copyright: "© 2025 Your Melody. All rights reserved.",
+  },
+
+  about: {
+    title: "About Us",
+    subtitle: "Professional Music Customization Service Platform",
+    mission: "Our Mission",
+    missionContent: "Your Melody is dedicated to creating unique music for every client. We believe everyone deserves their own melody. Through our professional music production team and advanced production process, we transform your ideas into moving music.",
+    team: "Professional Team",
+    teamContent: "We have an experienced music production team including composers, arrangers, sound engineers, and music producers. Each member has years of industry experience, dedicated to providing you with the highest quality music customization service.",
+    service: "Service Features",
+    serviceContent: "From style selection and mood setting to final production, we provide comprehensive music customization services. Whether it's a gift for friends and family or commercial soundtrack, we can meet your needs.",
+  },
+
+  contact: {
+    title: "Contact Us",
+    subtitle: "We're Here to Help",
+    getInTouch: "Get In Touch",
+    businessHours: "Business Hours",
+    businessHoursContent: "Monday - Friday: 9:00 AM - 6:00 PM",
+    email: "Email",
+    emailAddress: "support@yourmelody.com",
+    wechat: "WeChat",
+    wechatId: "YourMelody_Music",
+    address: "Address",
+    addressContent: "Music Creation Park, Chaoyang District, Beijing, China",
+    sendMessage: "Send Message",
+    name: "Name",
+    namePlaceholder: "Enter your name",
+    emailPlaceholder: "Enter your email",
+    message: "Message",
+    messagePlaceholder: "Enter your message...",
+    send: "Send",
   },
 };

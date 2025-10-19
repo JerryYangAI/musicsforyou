@@ -1,4 +1,5 @@
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { HeroSection } from "@/components/HeroSection";
 import { FeatureSection } from "@/components/FeatureSection";
 import { MusicLeaderboard } from "@/components/MusicLeaderboard";
@@ -22,27 +23,30 @@ export default function HomePage() {
   };
   
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Header />
-      <HeroSection />
-      <FeatureSection />
-      <MusicLeaderboard />
-      
-      {/* CTA Section */}
-      <section className="py-20 px-6 bg-gradient-to-br from-primary/10 to-chart-2/10">
-        <div className="container mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            {t.cta.title}
-          </h2>
-          <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-            {t.cta.subtitle}
-          </p>
-          <Button size="lg" onClick={handleCTAClick} data-testid="button-cta-start">
-            {t.cta.startNow}
-            <ArrowRight className="w-5 h-5 ml-2" />
-          </Button>
-        </div>
-      </section>
+      <main className="flex-1">
+        <HeroSection />
+        <FeatureSection />
+        <MusicLeaderboard />
+        
+        {/* CTA Section */}
+        <section className="py-20 px-6 bg-gradient-to-br from-primary/10 to-chart-2/10">
+          <div className="container mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              {t.cta.title}
+            </h2>
+            <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
+              {t.cta.subtitle}
+            </p>
+            <Button size="lg" onClick={handleCTAClick} data-testid="button-cta-start">
+              {t.cta.startNow}
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+          </div>
+        </section>
+      </main>
+      <Footer />
     </div>
   );
 }

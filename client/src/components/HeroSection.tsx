@@ -28,7 +28,7 @@ export function HeroSection() {
       <div className="relative z-10 container mx-auto px-6 py-20 text-center">
         <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6 text-white">
           <Sparkles className="w-4 h-4" />
-          <span className="text-sm font-medium">AI-Powered Music Creation</span>
+          <span className="text-sm font-medium">定制音乐惊喜，奏响心动旋律</span>
         </div>
 
         <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight">
@@ -40,7 +40,7 @@ export function HeroSection() {
         </h1>
 
         <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">
-          AI 定制专属音乐，一句话就能成，给朋友的独一份礼物！
+          定制专属音乐，一句话就能成，给朋友的独一份礼物！
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -65,7 +65,7 @@ export function HeroSection() {
 
         {/* Feature Pills */}
         <div className="flex flex-wrap gap-3 justify-center mt-12">
-          {["多种音乐风格", "即时生成", "高品质输出", "安全支付"].map(
+          {["多种音乐风格", "专业制作", "高品质输出", "安全支付"].map(
             (feature) => (
               <div
                 key={feature}

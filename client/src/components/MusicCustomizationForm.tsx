@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
-import { Music2, Guitar, Mic, Piano, Radio, X } from "lucide-react";
+import { Music2, Guitar, Mic, Piano, Radio } from "lucide-react";
 import { useLanguage } from "./LanguageProvider";
 
 const musicStyles = [
@@ -27,11 +27,11 @@ export function MusicCustomizationForm() {
   
   const [selectedStyle, setSelectedStyle] = useState<string>("pop");
   const [selectedMoods, setSelectedMoods] = useState<string[]>(["happy"]);
-  const [keywords, setKeywords] = useState<string[]>([]);
-  const [keywordInput, setKeywordInput] = useState("");
-  const [description, setDescription] = useState("");
+  const [lyrics, setLyrics] = useState("");
+  const [songTitle, setSongTitle] = useState("");
+  const [voiceType, setVoiceType] = useState<"male" | "female">("male");
   const [duration, setDuration] = useState([60]);
-  const [errors, setErrors] = useState<{ moods?: string; description?: string }>({});
+  const [errors, setErrors] = useState<{ moods?: string; lyrics?: string }>({});
 
   const toggleMood = (mood: string) => {
     setSelectedMoods(prev =>
@@ -39,27 +39,16 @@ export function MusicCustomizationForm() {
     );
   };
 
-  const addKeyword = () => {
-    if (keywordInput.trim() && keywords.length < 8) {
-      setKeywords([...keywords, keywordInput.trim()]);
-      setKeywordInput("");
-    }
-  };
-
-  const removeKeyword = (keyword: string) => {
-    setKeywords(keywords.filter(k => k !== keyword));
-  };
-
   const handleSubmit = () => {
     // Validate form
-    const newErrors: { moods?: string; description?: string } = {};
+    const newErrors: { moods?: string; lyrics?: string } = {};
     
     if (selectedMoods.length === 0) {
       newErrors.moods = t.music.moodPlaceholder;
     }
     
-    if (description.trim().length < 10) {
-      newErrors.description = t.music.detailPlaceholder;
+    if (lyrics.trim().length < 10) {
+      newErrors.lyrics = t.music.lyricsPlaceholder;
     }
     
     if (Object.keys(newErrors).length > 0) {
@@ -74,8 +63,9 @@ export function MusicCustomizationForm() {
     const orderDetails = {
       musicStyle: selectedStyle,
       musicMoods: selectedMoods,
-      musicKeywords: keywords,
-      musicDescription: description,
+      musicDescription: lyrics,
+      songTitle: songTitle || undefined,
+      voiceType: voiceType,
       musicDuration: duration[0],
       amount: 29.90,
     };
@@ -134,36 +124,70 @@ export function MusicCustomizationForm() {
           )}
         </div>
 
-        {/* Keywords */}
+        {/* Lyrics/Keywords */}
         <div className="space-y-3">
-          <Label htmlFor="keywords">{t.music.keywords}</Label>
-          <div className="flex gap-2">
-            <Input
-              id="keywords"
-              placeholder={t.music.keywordsPlaceholder}
-              value={keywordInput}
-              onChange={(e) => setKeywordInput(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addKeyword())}
-              data-testid="input-keyword"
-            />
-            <Button onClick={addKeyword} data-testid="button-add-keyword">
-              {t.music.addKeyword}
-            </Button>
+          <Label htmlFor="lyrics">{t.music.lyrics}</Label>
+          <Textarea
+            id="lyrics"
+            placeholder={t.music.lyricsPlaceholder}
+            value={lyrics}
+            onChange={(e) => setLyrics(e.target.value)}
+            maxLength={500}
+            rows={4}
+            data-testid="textarea-lyrics"
+          />
+          <div className="flex justify-between items-center">
+            <p className="text-xs text-muted-foreground">
+              {lyrics.length}/500 {t.music.characterCount}
+            </p>
+            {errors.lyrics && (
+              <p className="text-sm text-destructive">{errors.lyrics}</p>
+            )}
           </div>
-          {keywords.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {keywords.map((keyword) => (
-                <Badge key={keyword} variant="secondary" className="px-3 py-1">
-                  {keyword}
-                  <X
-                    className="w-3 h-3 ml-2 cursor-pointer"
-                    onClick={() => removeKeyword(keyword)}
-                    data-testid={`button-remove-${keyword}`}
-                  />
-                </Badge>
-              ))}
-            </div>
-          )}
+        </div>
+
+        {/* Song Title (Optional) */}
+        <div className="space-y-3">
+          <Label htmlFor="songTitle">{t.music.songTitle}</Label>
+          <Input
+            id="songTitle"
+            placeholder={t.music.songTitlePlaceholder}
+            value={songTitle}
+            onChange={(e) => setSongTitle(e.target.value)}
+            maxLength={100}
+            data-testid="input-song-title"
+          />
+        </div>
+
+        {/* Voice Type Selection */}
+        <div className="space-y-3">
+          <Label>{t.music.voiceType}</Label>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => setVoiceType("male")}
+              className={`p-4 rounded-md border-2 transition-all hover-elevate ${
+                voiceType === "male"
+                  ? "border-primary bg-primary/10"
+                  : "border-border"
+              }`}
+              data-testid="button-voice-male"
+            >
+              <Mic className="w-6 h-6 mx-auto mb-2" />
+              <span className="text-sm font-medium">{t.music.maleVoice}</span>
+            </button>
+            <button
+              onClick={() => setVoiceType("female")}
+              className={`p-4 rounded-md border-2 transition-all hover-elevate ${
+                voiceType === "female"
+                  ? "border-primary bg-primary/10"
+                  : "border-border"
+              }`}
+              data-testid="button-voice-female"
+            >
+              <Mic className="w-6 h-6 mx-auto mb-2" />
+              <span className="text-sm font-medium">{t.music.femaleVoice}</span>
+            </button>
+          </div>
         </div>
 
         {/* Duration */}
@@ -183,28 +207,6 @@ export function MusicCustomizationForm() {
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>30{t.music.durationUnit}</span>
             <span>180{t.music.durationUnit}</span>
-          </div>
-        </div>
-
-        {/* Description */}
-        <div className="space-y-3">
-          <Label htmlFor="description">{t.music.detailDescription}</Label>
-          <Textarea
-            id="description"
-            placeholder={t.music.detailPlaceholder}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            maxLength={500}
-            rows={4}
-            data-testid="textarea-description"
-          />
-          <div className="flex justify-between items-center">
-            <p className="text-xs text-muted-foreground">
-              {description.length}/500 {t.music.characterCount}
-            </p>
-            {errors.description && (
-              <p className="text-sm text-destructive">{errors.description}</p>
-            )}
           </div>
         </div>
 

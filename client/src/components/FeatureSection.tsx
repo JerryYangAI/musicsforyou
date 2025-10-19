@@ -8,8 +8,8 @@ export function FeatureSection() {
   const features = [
     {
       icon: Sparkles,
-      title: t.features.aiPowered,
-      description: t.features.aiPoweredDesc,
+      title: t.features.professional,
+      description: t.features.professionalDesc,
     },
     {
       icon: Award,

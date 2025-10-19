@@ -14,7 +14,7 @@ export const zh = {
   },
   
   header: {
-    brandName: "音乐定制工坊",
+    brandName: "音为你",
     home: "首页",
     create: "定制音乐",
     orders: "我的订单",
@@ -26,7 +26,7 @@ export const zh = {
 
   hero: {
     title: "专业音乐定制平台",
-    subtitle: "为您打造专属的音乐作品",
+    subtitle: "定制音乐惊喜，奏响心动旋律",
     description: "只需描述您的需求，我们的专业团队将为您创作独一无二的音乐作品",
     getStarted: "开始定制",
     learnMore: "了解更多",
@@ -107,6 +107,13 @@ export const zh = {
     detailPlaceholder: "描述您想要的音乐细节，如乐器、节奏等...",
     characterCount: "字符",
     continuePay: "继续支付",
+    lyrics: "歌词/关键词",
+    lyricsPlaceholder: "输入您想表达的关键词或主题，我们的团队将为您创作完整歌词...",
+    songTitle: "歌曲标题（可选）",
+    songTitlePlaceholder: "为您的音乐取个名字...",
+    voiceType: "声音类型",
+    maleVoice: "男声",
+    femaleVoice: "女声",
     styles: {
       pop: "流行",
       rock: "摇滚",
@@ -198,6 +205,44 @@ export const zh = {
     newPasswordMismatch: "两次输入的新密码不一致",
     incorrectPassword: "当前密码错误",
     samePasswordError: "新密码不能与当前密码相同",
+  },
+
+  footer: {
+    aboutUs: "关于我们",
+    contactUs: "联系我们",
+    copyright: "© 2025 音为你. 保留所有权利.",
+  },
+
+  about: {
+    title: "关于我们",
+    subtitle: "专业音乐定制服务平台",
+    mission: "我们的使命",
+    missionContent: "音为你致力于为每一位客户打造独一无二的音乐作品。我们相信，每个人都值得拥有属于自己的旋律。通过专业的音乐制作团队和先进的制作流程，我们将您的想法转化为动人的音乐。",
+    team: "专业团队",
+    teamContent: "我们拥有一支经验丰富的音乐制作团队，包括作曲家、编曲师、录音师和音乐制作人。每位成员都拥有多年的行业经验，致力于为您提供最优质的音乐定制服务。",
+    service: "服务特色",
+    serviceContent: "从风格选择、情绪设定到最终成品，我们提供全方位的音乐定制服务。无论是送给亲友的礼物，还是商业用途的配乐，我们都能满足您的需求。",
+  },
+
+  contact: {
+    title: "联系我们",
+    subtitle: "我们随时为您服务",
+    getInTouch: "与我们取得联系",
+    businessHours: "工作时间",
+    businessHoursContent: "周一至周五：9:00 - 18:00",
+    email: "邮箱",
+    emailAddress: "support@yinweini.com",
+    wechat: "微信",
+    wechatId: "YinWeiNi_Music",
+    address: "地址",
+    addressContent: "中国北京市朝阳区音乐创作园区",
+    sendMessage: "发送消息",
+    name: "姓名",
+    namePlaceholder: "请输入您的姓名",
+    emailPlaceholder: "请输入您的邮箱",
+    message: "留言",
+    messagePlaceholder: "请输入您的留言...",
+    send: "发送",
   },
 };
 
