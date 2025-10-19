@@ -59,6 +59,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ 
         id: user.id,
         username: user.username,
+        isAdmin: user.isAdmin || false,
       });
     } catch (error) {
       console.error("Registration error:", error);
@@ -94,6 +95,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         id: user.id,
         username: user.username,
+        isAdmin: user.isAdmin || false,
       });
     } catch (error) {
       console.error("Login error:", error);
@@ -126,6 +128,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         id: user.id,
         username: user.username,
+        isAdmin: user.isAdmin || false,
       });
     } catch (error) {
       console.error("Get user error:", error);
