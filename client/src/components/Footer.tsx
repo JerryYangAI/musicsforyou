@@ -12,15 +12,11 @@ export function Footer() {
             {t.footer.copyright}
           </div>
           <div className="flex gap-6">
-            <Link href="/about">
-              <a className="text-sm text-muted-foreground hover:text-foreground transition-colors" data-testid="link-about">
-                {t.footer.aboutUs}
-              </a>
+            <Link href="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors" data-testid="link-about">
+              {t.footer.aboutUs}
             </Link>
-            <Link href="/contact">
-              <a className="text-sm text-muted-foreground hover:text-foreground transition-colors" data-testid="link-contact">
-                {t.footer.contactUs}
-              </a>
+            <Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors" data-testid="link-contact">
+              {t.footer.contactUs}
             </Link>
           </div>
         </div>

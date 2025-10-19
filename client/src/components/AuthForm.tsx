@@ -50,7 +50,7 @@ export function AuthForm() {
         description: `${t.auth.welcome}, ${data.username}!`,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-      setLocation("/");
+      setLocation("/create");
     },
     onError: (error: Error) => {
       const errorMessage = error.message.includes("Invalid credentials") 
@@ -80,7 +80,7 @@ export function AuthForm() {
         description: `${t.auth.welcome}, ${data.username}!`,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-      setLocation("/");
+      setLocation("/create");
     },
     onError: (error: Error) => {
       const errorMessage = error.message;

@@ -1,8 +1,14 @@
-# AI Music Customization Platform
+# 音为你 (Your Melody) - Music Customization Platform
 
 ## Overview
 
-This is an AI-powered music customization platform that allows users to create custom music tracks by describing their desired style, mood, and other parameters. The platform features a modern, bilingual (Chinese/English) interface with a premium design aesthetic inspired by platforms like Spotify and Apple Music. Users can customize their music, manage orders, and complete payments through integrated payment providers.
+This is a professional music customization platform that allows users to create custom music tracks by describing their desired style, mood, and other parameters. The platform features a modern, bilingual (Chinese/English) interface with a premium design aesthetic inspired by platforms like Spotify and Apple Music. Users can customize their music, manage orders, and complete payments through integrated payment providers.
+
+**Brand Identity**:
+- Chinese Name: 音为你 (Yīn Wèi Nǐ)
+- English Name: Your Melody
+- Tagline (CN): 定制音乐惊喜，奏响心动旋律
+- Tagline (EN): Custom Music Surprises, Play the Melody of Your Heart
 
 ## User Preferences
 
@@ -140,7 +146,42 @@ Preferred communication style: Simple, everyday language.
 
 ### Build & Deployment
 
-**Recent Updates (October 2025)**
+**Recent Updates (October 19, 2025)**
+- ✅ **Redesigned Branding and Identity**
+  - Updated brand name to "音为你" (Chinese) / "Your Melody" (English)
+  - New tagline: "定制音乐惊喜，奏响心动旋律" / "Custom Music Surprises, Play the Melody of Your Heart"
+  - Removed all AI-related branding and messaging
+  - Updated from "Music Custom Studio" to emphasize personal music customization service
+  
+- ✅ **Enhanced User Experience Flow**
+  - Login and registration now redirect directly to /create (music customization page) instead of homepage
+  - Streamlined user journey: auth → create music immediately
+  
+- ✅ **Redesigned Music Customization Form (Suno-style)**
+  - **New Fields**:
+    - Lyrics/Keywords textarea: Users input keywords/themes, backend will generate full prompts
+    - Song Title input (optional): Users can name their custom music
+    - Voice Type selection: Male or Female voice options
+  - **Removed Features**:
+    - Keyword "Add" button removed for cleaner UI
+    - Description field replaced with lyrics-focused input
+  - Form validation updated: lyrics minimum 10 characters (was description)
+  - All fields fully localized (Chinese/English)
+  
+- ✅ **Added Footer Navigation System**
+  - Footer component with About Us and Contact Us links
+  - Created /about page (关于我们 / About Us) with mission, team, and service information
+  - Created /contact page (联系我们 / Contact Us) with:
+    - Business hours, email, WeChat ID, address information
+    - Contact form with name, email, and message fields
+  - Full bilingual support for all footer content
+  
+- ✅ **Fixed Hero Section Localization**
+  - Hero section now uses translation system (was hard-coded Chinese)
+  - All hero text properly switches between Chinese and English
+  - Feature pills updated: "专业制作" replaced "即时生成" for better brand alignment
+
+**Previous Updates**
 - ✅ Implemented session-based authentication with express-session middleware
 - ✅ Fixed critical session initialization bug in server/index.ts
 - ✅ Created music customization form with full i18n support
