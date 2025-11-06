@@ -13,7 +13,9 @@ import OrdersPage from "@/pages/OrdersPage";
 import PaymentPage from "@/pages/PaymentPage";
 import AuthPage from "@/pages/AuthPage";
 import ProfilePage from "@/pages/ProfilePage";
-import AdminPage from "@/pages/AdminPage";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import AdminOrders from "@/pages/admin/AdminOrders";
+import AdminOrderDetail from "@/pages/admin/AdminOrderDetail";
 import AboutPage from "@/pages/AboutPage";
 import ContactPage from "@/pages/ContactPage";
 
@@ -26,7 +28,9 @@ function Router() {
       <Route path="/payment" component={PaymentPage} />
       <Route path="/auth" component={AuthPage} />
       <Route path="/profile" component={ProfilePage} />
-      <Route path="/admin" component={AdminPage} />
+      <Route path="/admin" component={AdminDashboard} />
+      <Route path="/admin/orders" component={AdminOrders} />
+      <Route path="/admin/orders/:id" component={AdminOrderDetail} />
       <Route path="/about" component={AboutPage} />
       <Route path="/contact" component={ContactPage} />
       <Route component={NotFound} />
