@@ -14,7 +14,12 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useLanguage } from "./LanguageProvider";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY!);
+// Use test key in development, production key in production
+const stripePublicKey = import.meta.env.MODE === 'production'
+  ? import.meta.env.VITE_STRIPE_PUBLIC_KEY
+  : import.meta.env.TESTING_VITE_STRIPE_PUBLIC_KEY || import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+
+const stripePromise = loadStripe(stripePublicKey!);
 
 interface OrderDetails {
   musicStyle: string;
