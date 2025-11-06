@@ -11,6 +11,7 @@ export interface IStorage {
   getPublicMusicTracks(limit?: number): Promise<MusicTrack[]>;
   createMusicTrack(track: InsertMusicTrack): Promise<MusicTrack>;
   getUserOrders(userId: string): Promise<Order[]>;
+  createOrder(order: any): Promise<Order>;
   // Admin methods
   getAllOrders(): Promise<Order[]>;
   updateOrderMusicFile(orderId: string, musicFileUrl: string): Promise<void>;
@@ -87,6 +88,7 @@ export class MemStorage implements IStorage {
       id,
       username: insertUser.username,
       password: insertUser.password,
+      isAdmin: insertUser.isAdmin ?? false,
       createdAt: new Date(),
     };
     this.users.set(id, user);
@@ -127,6 +129,16 @@ export class MemStorage implements IStorage {
 
   async getUserOrders(userId: string): Promise<Order[]> {
     return [];
+  }
+
+  async createOrder(order: any): Promise<Order> {
+    // Not implemented for MemStorage, but return a mock order
+    return {
+      id: randomUUID(),
+      ...order,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
   }
 
   async getAllOrders(): Promise<Order[]> {
@@ -205,6 +217,11 @@ export class DbStorage implements IStorage {
       .where(eq(orders.userId, userId))
       .orderBy(desc(orders.createdAt));
     return userOrders;
+  }
+
+  async createOrder(orderData: any): Promise<Order> {
+    const [order] = await db.insert(orders).values(orderData).returning();
+    return order;
   }
 
   // Admin methods implementation

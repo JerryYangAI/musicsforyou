@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import Stripe from "stripe";
+import { insertOrderSchema } from "@shared/schema";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -207,6 +208,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching user orders:", error);
       res.status(500).json({ error: "Failed to fetch orders" });
+    }
+  });
+
+  // Create new order (after successful payment)
+  app.post("/api/orders", async (req, res) => {
+    try {
+      if (!req.session.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const orderData = insertOrderSchema.parse({
+        ...req.body,
+        userId: req.session.userId,
+      });
+
+      const order = await storage.createOrder(orderData);
+      res.json(order);
+    } catch (error) {
+      console.error("Error creating order:", error);
+      res.status(500).json({ error: "Failed to create order" });
     }
   });
 
