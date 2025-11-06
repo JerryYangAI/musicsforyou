@@ -32,41 +32,40 @@ export default function AdminOrderDetail() {
   const [selectedStatus, setSelectedStatus] = useState("");
 
   const { data: order, isLoading } = useQuery<SelectOrder>({
-    queryKey: ["/api/admin/orders", orderId],
+    queryKey: [`/api/admin/orders/${orderId}`],
     enabled: !!orderId,
   });
 
   const uploadMusicMutation = useMutation({
     mutationFn: async (url: string) => {
-      return apiRequest(`/api/admin/orders/${orderId}/music`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ musicFileUrl: url }),
-      });
+      const response = await apiRequest("PUT", `/api/admin/orders/${orderId}/music`, { musicFileUrl: url });
+      return response.json();
     },
     onSuccess: () => {
       toast({ title: t.admin.uploadSuccess });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/orders", orderId] });
+      queryClient.invalidateQueries({ queryKey: [`/api/admin/orders/${orderId}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/orders"] });
       setMusicFileUrl("");
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("Upload music error:", error);
       toast({ title: t.admin.uploadFailed, variant: "destructive" });
     },
   });
 
   const updateStatusMutation = useMutation({
     mutationFn: async (status: string) => {
-      return apiRequest(`/api/admin/orders/${orderId}/status`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
+      const response = await apiRequest("PUT", `/api/admin/orders/${orderId}/status`, { status });
+      return response.json();
     },
     onSuccess: () => {
       toast({ title: t.admin.statusUpdated });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/orders", orderId] });
+      queryClient.invalidateQueries({ queryKey: [`/api/admin/orders/${orderId}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/orders"] });
+      setSelectedStatus("");
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("Update status error:", error);
       toast({ title: t.admin.statusUpdateFailed, variant: "destructive" });
     },
   });

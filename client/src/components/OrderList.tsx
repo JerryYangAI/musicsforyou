@@ -97,11 +97,8 @@ export function OrderList() {
 
   const submitReviewMutation = useMutation({
     mutationFn: async ({ orderId, rating, comment }: { orderId: string; rating: number; comment: string }) => {
-      const review = await apiRequest("/api/reviews", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId, rating, comment }),
-      });
+      const response = await apiRequest("POST", "/api/reviews", { orderId, rating, comment });
+      const review = await response.json();
       return { orderId, review };
     },
     onSuccess: ({ orderId, review }) => {
