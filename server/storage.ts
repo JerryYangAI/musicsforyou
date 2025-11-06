@@ -1,7 +1,7 @@
-import { type User, type InsertUser, type MusicTrack, type InsertMusicTrack, type Order, users, musicTracks, orders } from "@shared/schema";
+import { type User, type InsertUser, type MusicTrack, type InsertMusicTrack, type Order, type Review, type InsertReview, users, musicTracks, orders, reviews } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and, gte, lte, sql } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -12,8 +12,13 @@ export interface IStorage {
   createMusicTrack(track: InsertMusicTrack): Promise<MusicTrack>;
   getUserOrders(userId: string): Promise<Order[]>;
   createOrder(order: any): Promise<Order>;
+  getOrder(orderId: string): Promise<Order | undefined>;
+  // Review methods
+  createReview(review: InsertReview): Promise<Review>;
+  getOrderReview(orderId: string): Promise<Review | undefined>;
   // Admin methods
   getAllOrders(): Promise<Order[]>;
+  getOrdersByDateRange(startDate: Date, endDate: Date): Promise<Order[]>;
   updateOrderMusicFile(orderId: string, musicFileUrl: string): Promise<void>;
   updateOrderStatus(orderId: string, status: string): Promise<void>;
   getOrderStats(): Promise<{
@@ -23,6 +28,11 @@ export interface IStorage {
     completed: number;
     cancelled: number;
     failed: number;
+  }>;
+  getOrderStatsByDateRange(startDate: Date, endDate: Date): Promise<{
+    totalOrders: number;
+    totalRevenue: string;
+    avgOrderValue: string;
   }>;
 }
 
@@ -141,7 +151,27 @@ export class MemStorage implements IStorage {
     };
   }
 
+  async getOrder(orderId: string): Promise<Order | undefined> {
+    return undefined;
+  }
+
+  async createReview(review: InsertReview): Promise<Review> {
+    return {
+      id: randomUUID(),
+      ...review,
+      createdAt: new Date(),
+    };
+  }
+
+  async getOrderReview(orderId: string): Promise<Review | undefined> {
+    return undefined;
+  }
+
   async getAllOrders(): Promise<Order[]> {
+    return [];
+  }
+
+  async getOrdersByDateRange(startDate: Date, endDate: Date): Promise<Order[]> {
     return [];
   }
 
@@ -168,6 +198,18 @@ export class MemStorage implements IStorage {
       completed: 0,
       cancelled: 0,
       failed: 0,
+    };
+  }
+
+  async getOrderStatsByDateRange(startDate: Date, endDate: Date): Promise<{
+    totalOrders: number;
+    totalRevenue: string;
+    avgOrderValue: string;
+  }> {
+    return {
+      totalOrders: 0,
+      totalRevenue: "0",
+      avgOrderValue: "0",
     };
   }
 }
@@ -224,6 +266,28 @@ export class DbStorage implements IStorage {
     return order;
   }
 
+  async getOrder(orderId: string): Promise<Order | undefined> {
+    const [order] = await db
+      .select()
+      .from(orders)
+      .where(eq(orders.id, orderId));
+    return order;
+  }
+
+  // Review methods implementation
+  async createReview(reviewData: InsertReview): Promise<Review> {
+    const [review] = await db.insert(reviews).values(reviewData).returning();
+    return review;
+  }
+
+  async getOrderReview(orderId: string): Promise<Review | undefined> {
+    const [review] = await db
+      .select()
+      .from(reviews)
+      .where(eq(reviews.orderId, orderId));
+    return review;
+  }
+
   // Admin methods implementation
   async getAllOrders(): Promise<Order[]> {
     const allOrders = await db
@@ -231,6 +295,18 @@ export class DbStorage implements IStorage {
       .from(orders)
       .orderBy(desc(orders.createdAt));
     return allOrders;
+  }
+
+  async getOrdersByDateRange(startDate: Date, endDate: Date): Promise<Order[]> {
+    const ordersInRange = await db
+      .select()
+      .from(orders)
+      .where(and(
+        gte(orders.createdAt, startDate),
+        lte(orders.createdAt, endDate)
+      ))
+      .orderBy(desc(orders.createdAt));
+    return ordersInRange;
   }
 
   async updateOrderMusicFile(orderId: string, musicFileUrl: string): Promise<void> {
@@ -271,6 +347,28 @@ export class DbStorage implements IStorage {
       completed: allOrders.filter(o => o.orderStatus === "completed").length,
       cancelled: allOrders.filter(o => o.orderStatus === "cancelled").length,
       failed: allOrders.filter(o => o.orderStatus === "failed").length,
+    };
+  }
+
+  async getOrderStatsByDateRange(startDate: Date, endDate: Date): Promise<{
+    totalOrders: number;
+    totalRevenue: string;
+    avgOrderValue: string;
+  }> {
+    const ordersInRange = await this.getOrdersByDateRange(startDate, endDate);
+    
+    const totalRevenue = ordersInRange.reduce((sum, order) => {
+      return sum + parseFloat(order.amount);
+    }, 0);
+    
+    const avgOrderValue = ordersInRange.length > 0 
+      ? (totalRevenue / ordersInRange.length).toFixed(2)
+      : "0.00";
+    
+    return {
+      totalOrders: ordersInRange.length,
+      totalRevenue: totalRevenue.toFixed(2),
+      avgOrderValue,
     };
   }
 }
