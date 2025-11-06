@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Mail, Clock, MapPin, MessageCircle } from "lucide-react";
+import { Mail, Clock, MapPin, MessageSquare } from "lucide-react";
+import whatsappQR from "@assets/What's APP QR_1762426755542.png";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -33,21 +34,25 @@ export default function ContactPage() {
       icon: Clock,
       title: t.contact.businessHours,
       content: t.contact.businessHoursContent,
+      type: "text" as const,
     },
     {
       icon: Mail,
       title: t.contact.email,
       content: t.contact.emailAddress,
+      type: "text" as const,
     },
     {
-      icon: MessageCircle,
-      title: t.contact.wechat,
-      content: t.contact.wechatId,
+      icon: MessageSquare,
+      title: t.contact.whatsapp,
+      content: t.contact.whatsappInfo,
+      type: "qrcode" as const,
     },
     {
       icon: MapPin,
       title: t.contact.address,
       content: t.contact.addressContent,
+      type: "text" as const,
     },
   ];
 
@@ -81,9 +86,24 @@ export default function ContactPage() {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <CardDescription className="text-base">
-                        {info.content}
-                      </CardDescription>
+                      {info.type === "qrcode" ? (
+                        <div className="space-y-3">
+                          <CardDescription className="text-base">
+                            {info.content}
+                          </CardDescription>
+                          <div className="flex justify-center">
+                            <img 
+                              src={whatsappQR} 
+                              alt="WhatsApp QR Code" 
+                              className="w-48 h-48 rounded-lg border-2 border-primary/20"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <CardDescription className="text-base">
+                          {info.content}
+                        </CardDescription>
+                      )}
                     </CardContent>
                   </Card>
                 ))}
