@@ -172,7 +172,7 @@ Preferred communication style: Simple, everyday language.
   - Footer component with About Us and Contact Us links
   - Created /about page (关于我们 / About Us) with mission, team, and service information
   - Created /contact page (联系我们 / Contact Us) with:
-    - Business hours, email, WeChat ID, address information
+    - Business hours, email, address information
     - Contact form with name, email, and message fields
   - Full bilingual support for all footer content
   
@@ -180,6 +180,26 @@ Preferred communication style: Simple, everyday language.
   - Hero section now uses translation system (was hard-coded Chinese)
   - All hero text properly switches between Chinese and English
   - Feature pills updated: "专业制作" replaced "即时生成" for better brand alignment
+
+**Recent Updates (November 6, 2025)**
+- ✅ **Contact Page Modernization**
+  - Email updated to yguang@umich.edu (University of Michigan)
+  - WhatsApp replaced WeChat with QR code integration
+  - WhatsApp QR code display: attached_assets/What's APP QR_1762426755542.png
+  - Formspree integration for contact form (Form ID: movpgnbg)
+  - Real-time form submission with success/error toast notifications
+  - Form auto-clears after successful submission
+  
+- ✅ **Brand Identity Enhancement**
+  - Custom logo integrated: attached_assets/Logo_1762426221156.png
+  - Logo replaces music icon in Header component
+  - Logo displays consistently across all pages
+  
+- ✅ **About Page Team Update**
+  - Team background updated to Berkeley Music College (伯克利音乐学院)
+  - University of Michigan music orchestra graduates (密歇根大学音乐学院管弦乐团)
+  - Professional music education credentials emphasized
+  - Full bilingual team introduction (Chinese/English)
 
 **Previous Updates**
 - ✅ Implemented session-based authentication with express-session middleware

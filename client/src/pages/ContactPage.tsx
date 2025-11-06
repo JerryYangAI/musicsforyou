@@ -25,7 +25,7 @@ export default function ContactPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("https://formspree.io/f/xldebwyb", {
+      const response = await fetch("https://formspree.io/f/movpgnbg", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -38,6 +38,7 @@ export default function ContactPage() {
       });
 
       if (response.ok) {
+        console.log("Formspree submission successful!");
         toast({
           title: t.common.success,
           description: t.contact.messageSent || "我们已收到您的留言，会尽快回复！",
@@ -46,9 +47,11 @@ export default function ContactPage() {
         setEmail("");
         setMessage("");
       } else {
+        console.error("Formspree submission failed with status:", response.status);
         throw new Error("Failed to send message");
       }
     } catch (error) {
+      console.error("Formspree submission error:", error);
       toast({
         title: t.common.error,
         description: t.contact.messageFailed || "发送失败，请稍后重试",
