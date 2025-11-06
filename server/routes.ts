@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import Stripe from "stripe";
-import { insertOrderSchema } from "@shared/schema";
+import { insertOrderSchema, insertReviewSchema } from "@shared/schema";
 
 // Use test key in development, production key in production
 const stripeSecretKey = process.env.NODE_ENV === 'production' 
@@ -248,6 +248,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin: Get single order details
+  app.get("/api/admin/orders/:id", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const order = await storage.getOrder(id);
+      
+      if (!order) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+      
+      res.json(order);
+    } catch (error) {
+      console.error("Error fetching order:", error);
+      res.status(500).json({ error: "Failed to fetch order" });
+    }
+  });
+
   // Admin: Upload music file to order
   app.put("/api/admin/orders/:id/music", requireAdmin, async (req, res) => {
     try {
@@ -293,6 +310,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching stats:", error);
       res.status(500).json({ error: "Failed to fetch stats" });
+    }
+  });
+
+  // Admin: Get order statistics by date range
+  app.get("/api/admin/stats/range", requireAdmin, async (req, res) => {
+    try {
+      const { startDate, endDate } = req.query;
+      
+      if (!startDate || !endDate) {
+        return res.status(400).json({ error: "Start date and end date are required" });
+      }
+      
+      const start = new Date(startDate as string);
+      const end = new Date(endDate as string);
+      
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return res.status(400).json({ error: "Invalid date format" });
+      }
+      
+      const stats = await storage.getOrderStatsByDateRange(start, end);
+      const orders = await storage.getOrdersByDateRange(start, end);
+      
+      res.json({ ...stats, orders });
+    } catch (error) {
+      console.error("Error fetching range stats:", error);
+      res.status(500).json({ error: "Failed to fetch statistics" });
+    }
+  });
+
+  // Create review for an order
+  app.post("/api/reviews", async (req, res) => {
+    try {
+      if (!req.session.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const { orderId, rating, comment } = req.body;
+
+      // Verify order belongs to user
+      const order = await storage.getOrder(orderId);
+      if (!order) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+      if (order.userId !== req.session.userId) {
+        return res.status(403).json({ error: "Not authorized to review this order" });
+      }
+
+      // Check if review already exists
+      const existingReview = await storage.getOrderReview(orderId);
+      if (existingReview) {
+        return res.status(400).json({ error: "Review already exists for this order" });
+      }
+
+      const reviewData = {
+        orderId,
+        userId: req.session.userId,
+        rating,
+        comment: comment || null,
+      };
+
+      const review = await storage.createReview(reviewData);
+      res.json(review);
+    } catch (error: any) {
+      console.error("Error creating review:", error);
+      res.status(500).json({ error: "Failed to create review" });
+    }
+  });
+
+  // Get review for an order
+  app.get("/api/orders/:id/review", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const review = await storage.getOrderReview(id);
+      
+      if (!review) {
+        return res.status(404).json({ error: "Review not found" });
+      }
+      
+      res.json(review);
+    } catch (error) {
+      console.error("Error fetching review:", error);
+      res.status(500).json({ error: "Failed to fetch review" });
     }
   });
   

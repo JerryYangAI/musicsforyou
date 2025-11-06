@@ -159,6 +159,7 @@ export class MemStorage implements IStorage {
     return {
       id: randomUUID(),
       ...review,
+      comment: review.comment ?? null,
       createdAt: new Date(),
     };
   }
