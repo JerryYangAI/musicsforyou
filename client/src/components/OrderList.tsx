@@ -1,18 +1,63 @@
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLanguage } from "./LanguageProvider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Music, Loader2, Download, Clock } from "lucide-react";
-import type { Order } from "@shared/schema";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { Music, Loader2, Download, Clock, Play, Pause, Star } from "lucide-react";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import type { Order, SelectReview } from "@shared/schema";
 import { format } from "date-fns";
+
+interface ReviewFormState {
+  [orderId: string]: {
+    rating: number;
+    comment: string;
+  };
+}
 
 export function OrderList() {
   const { t } = useLanguage();
+  const { toast } = useToast();
   const { data: orders = [], isLoading } = useQuery<Order[]>({
     queryKey: ["/api/orders"],
   });
+
+  const [playingAudio, setPlayingAudio] = useState<string | null>(null);
+  const [audioElements, setAudioElements] = useState<{ [key: string]: HTMLAudioElement }>({});
+  const [reviewForms, setReviewForms] = useState<ReviewFormState>({});
+  const [orderReviews, setOrderReviews] = useState<{ [orderId: string]: SelectReview }>({});
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(audioElements).forEach(audio => {
+        audio.pause();
+        audio.src = "";
+      });
+    };
+  }, [audioElements]);
+
+  // Fetch reviews for each completed order with music file
+  useEffect(() => {
+    orders
+      .filter(o => o.musicFileUrl && o.orderStatus === "completed")
+      .forEach(async (order) => {
+        try {
+          const response = await fetch(`/api/orders/${order.id}/review`);
+          if (response.ok) {
+            const review = await response.json();
+            setOrderReviews(prev => ({ ...prev, [order.id]: review }));
+          }
+        } catch (error) {
+          // Review doesn't exist yet, which is fine
+        }
+      });
+  }, [orders]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -27,6 +72,81 @@ export function OrderList() {
       default:
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
     }
+  };
+
+  const handlePlayPause = (orderId: string, musicUrl: string) => {
+    if (playingAudio === orderId) {
+      audioElements[orderId]?.pause();
+      setPlayingAudio(null);
+    } else {
+      if (playingAudio) {
+        audioElements[playingAudio]?.pause();
+      }
+      
+      let audio = audioElements[orderId];
+      if (!audio) {
+        audio = new Audio(musicUrl);
+        audio.onended = () => setPlayingAudio(null);
+        setAudioElements(prev => ({ ...prev, [orderId]: audio }));
+      }
+      
+      audio.play();
+      setPlayingAudio(orderId);
+    }
+  };
+
+  const submitReviewMutation = useMutation({
+    mutationFn: async ({ orderId, rating, comment }: { orderId: string; rating: number; comment: string }) => {
+      const review = await apiRequest("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId, rating, comment }),
+      });
+      return { orderId, review };
+    },
+    onSuccess: ({ orderId, review }) => {
+      toast({ title: t.orders.reviewSubmitted });
+      setOrderReviews(prev => ({ ...prev, [orderId]: review }));
+      setReviewForms(prev => {
+        const newForms = { ...prev };
+        delete newForms[orderId];
+        return newForms;
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+    },
+    onError: (error: any) => {
+      const message = error.message?.includes("already exists") 
+        ? t.orders.alreadyReviewed 
+        : t.orders.reviewFailed;
+      toast({ title: message, variant: "destructive" });
+    },
+  });
+
+  const handleSubmitReview = (orderId: string) => {
+    const form = reviewForms[orderId];
+    if (!form || form.rating === 0) {
+      toast({ title: t.orders.rating, variant: "destructive" });
+      return;
+    }
+    submitReviewMutation.mutate({
+      orderId,
+      rating: form.rating,
+      comment: form.comment,
+    });
+  };
+
+  const setReviewRating = (orderId: string, rating: number) => {
+    setReviewForms(prev => ({
+      ...prev,
+      [orderId]: { ...prev[orderId], rating, comment: prev[orderId]?.comment || "" }
+    }));
+  };
+
+  const setReviewComment = (orderId: string, comment: string) => {
+    setReviewForms(prev => ({
+      ...prev,
+      [orderId]: { ...prev[orderId], rating: prev[orderId]?.rating || 0, comment }
+    }));
   };
 
   const completedOrders = orders.filter(o => o.orderStatus === "completed");
@@ -75,22 +195,124 @@ export function OrderList() {
         </div>
 
         {order.musicFileUrl && (
-          <div className="pt-3 border-t">
+          <div className="pt-3 border-t space-y-3">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-2 text-sm text-green-700">
                 <Music className="h-4 w-4" />
                 <span>{t.orders.musicFile}</span>
               </div>
-              <Button 
-                asChild
-                size="sm"
-                data-testid={`button-download-${order.id}`}
-              >
-                <a href={order.musicFileUrl} target="_blank" rel="noopener noreferrer" download>
-                  <Download className="h-4 w-4 mr-2" />
-                  {t.orders.download}
-                </a>
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handlePlayPause(order.id, order.musicFileUrl!)}
+                  data-testid={`button-preview-${order.id}`}
+                >
+                  {playingAudio === order.id ? (
+                    <>
+                      <Pause className="h-4 w-4 mr-2" />
+                      {t.orders.preview}
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-4 w-4 mr-2" />
+                      {t.orders.preview}
+                    </>
+                  )}
+                </Button>
+                <Button 
+                  asChild
+                  size="sm"
+                  data-testid={`button-download-${order.id}`}
+                >
+                  <a href={order.musicFileUrl} target="_blank" rel="noopener noreferrer" download>
+                    <Download className="h-4 w-4 mr-2" />
+                    {t.orders.download}
+                  </a>
+                </Button>
+              </div>
+            </div>
+
+            {/* Review Section */}
+            <div className="pt-3 border-t">
+              {orderReviews[order.id] ? (
+                // Display existing review
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">{t.orders.rating}</Label>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`h-5 w-5 ${
+                          orderReviews[order.id].rating >= star
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-gray-300"
+                        }`}
+                      />
+                    ))}
+                    <span className="ml-2 text-sm text-muted-foreground">
+                      {orderReviews[order.id].rating}/5
+                    </span>
+                  </div>
+                  {orderReviews[order.id].comment && (
+                    <div>
+                      <Label className="text-sm font-medium">{t.orders.comment}</Label>
+                      <p className="text-sm text-muted-foreground mt-1" data-testid={`text-review-comment-${order.id}`}>
+                        {orderReviews[order.id].comment}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                // Show review form if no review exists
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">{t.orders.writeReview}</Label>
+                  
+                  {/* Star Rating */}
+                  <div className="flex gap-1 mb-3">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setReviewRating(order.id, star)}
+                        className="hover-elevate p-1 rounded"
+                        data-testid={`button-rating-${star}-${order.id}`}
+                      >
+                        <Star
+                          className={`h-5 w-5 ${
+                            (reviewForms[order.id]?.rating || 0) >= star
+                              ? "fill-yellow-400 text-yellow-400"
+                              : "text-gray-300"
+                          }`}
+                        />
+                      </button>
+                    ))}
+                    {reviewForms[order.id]?.rating > 0 && (
+                      <span className="ml-2 text-sm text-muted-foreground">
+                        {reviewForms[order.id].rating}/5
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Comment */}
+                  <Textarea
+                    placeholder={t.orders.commentPlaceholder}
+                    value={reviewForms[order.id]?.comment || ""}
+                    onChange={(e) => setReviewComment(order.id, e.target.value)}
+                    className="mb-2"
+                    data-testid={`textarea-comment-${order.id}`}
+                  />
+
+                  <Button
+                    size="sm"
+                    onClick={() => handleSubmitReview(order.id)}
+                    disabled={!reviewForms[order.id]?.rating || submitReviewMutation.isPending}
+                    data-testid={`button-submit-review-${order.id}`}
+                  >
+                    {submitReviewMutation.isPending ? t.common.loading : t.orders.submitReview}
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         )}
