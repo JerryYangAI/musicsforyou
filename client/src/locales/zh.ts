@@ -243,6 +243,8 @@ export const zh = {
     message: "留言",
     messagePlaceholder: "请输入您的留言...",
     send: "发送",
+    messageSent: "我们已收到您的留言，会尽快回复！",
+    messageFailed: "发送失败，请稍后重试",
   },
 };
 

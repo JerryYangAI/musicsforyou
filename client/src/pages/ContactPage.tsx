@@ -18,15 +18,45 @@ export default function ContactPage() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: t.common.success,
-      description: "我们已收到您的留言，会尽快回复！",
-    });
-    setName("");
-    setEmail("");
-    setMessage("");
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("https://formspree.io/f/xldebwyb", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          message,
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: t.common.success,
+          description: t.contact.messageSent || "我们已收到您的留言，会尽快回复！",
+        });
+        setName("");
+        setEmail("");
+        setMessage("");
+      } else {
+        throw new Error("Failed to send message");
+      }
+    } catch (error) {
+      toast({
+        title: t.common.error,
+        description: t.contact.messageFailed || "发送失败，请稍后重试",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactInfo = [
@@ -152,8 +182,8 @@ export default function ContactPage() {
                         data-testid="textarea-contact-message"
                       />
                     </div>
-                    <Button type="submit" className="w-full" data-testid="button-send-message">
-                      {t.contact.send}
+                    <Button type="submit" className="w-full" disabled={isSubmitting} data-testid="button-send-message">
+                      {isSubmitting ? t.common.loading : t.contact.send}
                     </Button>
                   </form>
                 </CardContent>

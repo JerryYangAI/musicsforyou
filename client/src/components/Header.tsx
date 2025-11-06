@@ -2,8 +2,9 @@ import { Button } from "@/components/ui/button";
 import { LanguageToggle } from "./LanguageToggle";
 import { useLanguage } from "./LanguageProvider";
 import { useAuth } from "./AuthProvider";
-import { Music, User, LogOut, Shield } from "lucide-react";
+import { User, LogOut, Shield } from "lucide-react";
 import { Link, useLocation } from "wouter";
+import logoImage from "@assets/Logo_1762426221156.png";
 
 export function Header() {
   const { t } = useLanguage();
@@ -28,9 +29,7 @@ export function Header() {
       <div className="container mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 hover-elevate px-3 py-2 rounded-md transition-all" data-testid="link-home">
-          <div className="p-1.5 bg-gradient-to-br from-primary to-chart-2 rounded-lg">
-            <Music className="w-5 h-5 text-white" />
-          </div>
+          <img src={logoImage} alt={t.header.brandName} className="h-10 w-auto" />
           <span className="font-bold text-lg">{t.header.brandName}</span>
         </Link>
 

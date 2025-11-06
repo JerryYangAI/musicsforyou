@@ -245,5 +245,7 @@ export const en: Translations = {
     message: "Message",
     messagePlaceholder: "Enter your message...",
     send: "Send",
+    messageSent: "We have received your message and will reply soon!",
+    messageFailed: "Failed to send. Please try again later.",
   },
 };
