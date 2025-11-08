@@ -48,7 +48,7 @@ export const en: Translations = {
 
   leaderboard: {
     title: "Music Leaderboard",
-    subtitle: "Discover amazing music customized by others, with 10-second previews",
+    subtitle: "Discover amazing music customized by others, click to play full preview",
     noMusic: "No public music available",
     creator: "Customer",
     style: "Style",

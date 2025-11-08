@@ -46,7 +46,7 @@ export const zh = {
 
   leaderboard: {
     title: "音乐试听榜单",
-    subtitle: "发现其他用户定制的精彩音乐，每首支持试听10秒",
+    subtitle: "发现其他用户定制的精彩音乐，点击播放完整试听",
     noMusic: "暂无公开音乐作品",
     creator: "定制者",
     style: "风格",
