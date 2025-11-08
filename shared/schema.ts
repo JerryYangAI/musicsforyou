@@ -22,12 +22,17 @@ export type User = typeof users.$inferSelect;
 export const musicTracks = pgTable("music_tracks", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
+  titleEn: text("title_en"),
   description: text("description"),
+  descriptionEn: text("description_en"),
+  genre: text("genre"),
+  genreEn: text("genre_en"),
   style: text("style"),
   audioUrl: text("audio_url").notNull(),
   userId: varchar("user_id").references(() => users.id),
   username: text("username").notNull(),
   isPublic: boolean("is_public").default(true).notNull(),
+  isShowcase: boolean("is_showcase").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
