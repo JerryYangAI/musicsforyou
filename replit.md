@@ -40,9 +40,10 @@ Preferred communication style: Simple, everyday language.
 - **Music Showcase Gallery**: Public gallery displaying demo tracks with bilingual descriptions (CN/EN).
   - Showcase tracks marked with special badge, prioritized in display order.
   - 10-second audio preview with HTML5 Audio API.
-  - Showcase tracks:
-    1. "给丽娟的歌" (Song for Lijuan) - Pop Ballad/Acoustic/Sentimental
-    2. "夏日海风" (Summer Sea Breeze) - Light Music/Ocean Chill/Summer Pop
+  - Showcase tracks (3 total):
+    1. "给鼎爷的歌" (Song for Dingye) - Pop/Light Rock/Tribute
+    2. "给丽娟的歌" (Song for Lijuan) - Pop Ballad/Acoustic/Sentimental
+    3. "夏日海风" (Summer Sea Breeze) - Light Music/Ocean Chill/Summer Pop
 - **Order Management**: Users can view their own orders, admins can view all orders, update status, and upload music files.
 - **Payment Processing**: Stripe integration for credit card payments, WeChat Pay placeholder, order creation via `/api/orders`.
 - **User Profile**: Password change functionality with current password verification.
