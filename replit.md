@@ -21,13 +21,15 @@ Preferred communication style: Simple, everyday language.
 
 ### Data Storage
 - **Database**: PostgreSQL (via Neon serverless) with Drizzle ORM for type-safe operations and migrations.
-- **Schema**: `users` and `music_tracks` tables with UUIDs and foreign keys.
+- **Schema**: `users`, `music_tracks`, `orders`, and `reviews` tables with UUIDs and foreign keys.
+  - **musicTracks**: Supports bilingual content (titleEn, descriptionEn, genreEn) and showcase flag (isShowcase).
 - **Storage Strategy**: Interface-based abstraction (`IStorage`) with in-memory (development) and PostgreSQL (production) implementations.
 - **Object Storage**: Replit Object Storage (Google Cloud Storage backend) for music file uploads and hosting.
   - **Bucket**: Default bucket `repl-default-bucket-0fa1280d-8519-4770-95e7-9643dabcdb41` created automatically.
   - **File Management**: Admin-uploaded music files stored in private directory (`PRIVATE_OBJECT_DIR/music/`), with ACL-based access control.
   - **Upload System**: Presigned URL-based uploads via Uppy integration (max 100MB, supports MP3/WAV/M4A/FLAC/OGG).
   - **Access Control**: Files owned by admin uploader, public visibility for completed orders.
+- **Public Assets**: Showcase music files stored in `client/public/showcase-music/` for direct access.
 
 ### Authentication & Authorization
 - **Authentication**: Username/password, session-based using `express-session` with secure httpOnly cookies, bcrypt hashing, `AuthProvider` for global user state.
@@ -35,12 +37,16 @@ Preferred communication style: Simple, everyday language.
 
 ### Core Features
 - **Music Customization**: Form with lyrics/keywords input, optional song title, voice type selection (male/female).
+- **Music Showcase Gallery**: Public gallery displaying demo tracks with bilingual descriptions (CN/EN).
+  - Showcase tracks marked with special badge, prioritized in display order.
+  - 10-second audio preview with HTML5 Audio API.
+  - First showcase track: "夏日海风" (Summer Sea Breeze) - Light Music/Ocean Chill.
 - **Order Management**: Users can view their own orders, admins can view all orders, update status, and upload music files.
 - **Payment Processing**: Stripe integration for credit card payments, WeChat Pay placeholder, order creation via `/api/orders`.
 - **User Profile**: Password change functionality with current password verification.
 - **Music Playback & Download**: HTML5 Audio API for 10-second previews, download for completed orders.
 - **Review System**: 5-star rating, optional comments, unique per order, server-side validation for order ownership.
-- **Admin System**: Dashboard with statistics, order list with filtering, order detail page for drag-and-drop music file upload via Uppy and status management.
+- **Admin System**: Dashboard with statistics, order list with filtering, order detail page for drag-and-drop music file upload via Uppy and status management, showcase music management.
 
 ### Build & Deployment
 - Client build with Vite, server build with esbuild, TypeScript compilation checks.
@@ -75,6 +81,10 @@ Preferred communication style: Simple, everyday language.
   - **Permissions**: `READ` (view/download) and `WRITE` (modify/delete).
 
 ### API Endpoints for File Management
-- `GET /objects/:objectPath(*)`: Serves uploaded music files with caching.
+- `GET /objects/:objectPath(*)`: Serves uploaded music files with ACL-based access control and caching.
 - `POST /api/objects/upload`: Generates presigned upload URL (admin only).
 - `PUT /api/music-files`: Associates uploaded file with order, sets public ACL (admin only).
+
+### API Endpoints for Music Showcase
+- `GET /api/music/public`: Returns public music tracks, prioritizing showcase tracks.
+- `POST /api/admin/showcase-music`: Adds new showcase music with bilingual metadata (admin only).
