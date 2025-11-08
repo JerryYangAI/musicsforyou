@@ -5,6 +5,8 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import Stripe from "stripe";
 import { insertOrderSchema, insertReviewSchema } from "@shared/schema";
+import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
+import { ObjectPermission } from "./objectAcl";
 
 // Use test key in development, production key in production
 const stripeSecretKey = process.env.NODE_ENV === 'production' 
@@ -420,6 +422,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error creating payment intent:", error);
       res.status(500).json({ error: "Error creating payment intent: " + error.message });
+    }
+  });
+
+  // Object Storage endpoints for admin music file uploads
+  
+  // Serve uploaded music files (with ACL-based access control)
+  app.get("/objects/:objectPath(*)", async (req, res) => {
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(req.path);
+      
+      // Check ACL permissions before serving the file
+      const userId = req.session.userId;
+      const canAccess = await objectStorageService.canAccessObjectEntity({
+        userId,
+        objectFile,
+        requestedPermission: ObjectPermission.READ,
+      });
+
+      if (!canAccess) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Error serving object:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
+    }
+  });
+
+  // Get presigned URL for music file upload (admin only)
+  app.post("/api/objects/upload", requireAdmin, async (req, res) => {
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      res.json({ uploadURL });
+    } catch (error: any) {
+      console.error("Error getting upload URL:", error);
+      res.status(500).json({ error: "Failed to get upload URL: " + error.message });
+    }
+  });
+
+  // Update order with uploaded music file (admin only)
+  app.put("/api/music-files", requireAdmin, async (req, res) => {
+    try {
+      if (!req.body.musicFileURL || !req.body.orderId) {
+        return res.status(400).json({ error: "musicFileURL and orderId are required" });
+      }
+
+      const { musicFileURL, orderId } = req.body;
+      const userId = req.session.userId;
+
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const objectStorageService = new ObjectStorageService();
+      
+      // Set ACL policy for the uploaded file (public access)
+      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        musicFileURL,
+        {
+          owner: userId,
+          visibility: "public",
+        },
+      );
+
+      // Update order with the music file URL
+      await storage.updateOrderMusicFile(orderId, objectPath);
+
+      res.status(200).json({
+        objectPath: objectPath,
+      });
+    } catch (error: any) {
+      console.error("Error setting music file:", error);
+      res.status(500).json({ error: "Internal server error: " + error.message });
     }
   });
 

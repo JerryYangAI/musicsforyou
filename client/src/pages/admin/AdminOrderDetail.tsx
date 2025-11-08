@@ -10,7 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Upload } from "lucide-react";
+import { ObjectUploader } from "@/components/ObjectUploader";
 
 interface OrderDetail {
   id: string;
@@ -53,7 +54,10 @@ export default function AdminOrderDetail() {
 
   const uploadMusicMutation = useMutation({
     mutationFn: async (url: string) => {
-      const response = await apiRequest("PUT", `/api/admin/orders/${orderId}/music`, { musicFileUrl: url });
+      const response = await apiRequest("PUT", `/api/music-files`, { 
+        musicFileURL: url,
+        orderId: orderId 
+      });
       return response.json();
     },
     onSuccess: () => {
@@ -200,25 +204,34 @@ export default function AdminOrderDetail() {
                 </div>
               )}
 
-              <div className="space-y-2">
-                <Label htmlFor="musicFileUrl">{t.admin.musicFileUrl}</Label>
-                <Input
-                  id="musicFileUrl"
-                  type="url"
-                  placeholder={t.admin.musicFileUrlPlaceholder}
-                  value={musicFileUrl}
-                  onChange={(e) => setMusicFileUrl(e.target.value)}
-                  data-testid="input-music-url"
-                />
-              </div>
+              <div className="space-y-4">
+                <ObjectUploader
+                  maxNumberOfFiles={1}
+                  maxFileSize={104857600}
+                  onGetUploadParameters={async () => {
+                    const response = await apiRequest("POST", "/api/objects/upload", {});
+                    const data = await response.json();
+                    return {
+                      method: "PUT" as const,
+                      url: data.uploadURL,
+                    };
+                  }}
+                  onComplete={(result) => {
+                    if (result.successful && result.successful.length > 0) {
+                      const uploadedFile = result.successful[0];
+                      const uploadURL = uploadedFile.uploadURL;
+                      uploadMusicMutation.mutate(uploadURL);
+                    }
+                  }}
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  {t.admin.uploadMusic}
+                </ObjectUploader>
 
-              <Button
-                onClick={() => uploadMusicMutation.mutate(musicFileUrl)}
-                disabled={!musicFileUrl || uploadMusicMutation.isPending}
-                data-testid="button-upload-music"
-              >
-                {uploadMusicMutation.isPending ? t.common.loading : t.admin.uploadMusic}
-              </Button>
+                <div className="text-sm text-muted-foreground">
+                  {t.admin.supportedFormats || "支持格式：MP3, WAV, M4A, FLAC, OGG (最大100MB)"}
+                </div>
+              </div>
             </CardContent>
           </Card>
 
