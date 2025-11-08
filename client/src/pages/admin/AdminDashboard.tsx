@@ -14,7 +14,7 @@ interface OrderStats {
 }
 
 export default function AdminDashboard() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
 
   const { data: stats, isLoading } = useQuery<OrderStats>({
     queryKey: ["/api/admin/stats"],
@@ -85,17 +85,35 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{t.admin.ordersManagement}</CardTitle>
-            <CardDescription>{t.admin.allOrders}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link href="/admin/orders">
-              <Button data-testid="button-view-orders">{t.admin.allOrders}</Button>
-            </Link>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>{t.admin.ordersManagement}</CardTitle>
+              <CardDescription>{t.admin.allOrders}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/admin/orders">
+                <Button data-testid="button-view-orders">{t.admin.allOrders}</Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>{locale === "zh" ? "展示音乐管理" : "Showcase Music Management"}</CardTitle>
+              <CardDescription>
+                {locale === "zh" ? "添加展示音乐到首页榜单" : "Add showcase music to homepage leaderboard"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/admin/showcase-music">
+                <Button data-testid="button-showcase-music">
+                  {locale === "zh" ? "管理展示音乐" : "Manage Showcase Music"}
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

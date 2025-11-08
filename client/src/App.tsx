@@ -16,6 +16,7 @@ import ProfilePage from "@/pages/ProfilePage";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminOrders from "@/pages/admin/AdminOrders";
 import AdminOrderDetail from "@/pages/admin/AdminOrderDetail";
+import AdminShowcaseMusic from "@/pages/admin/AdminShowcaseMusic";
 import AboutPage from "@/pages/AboutPage";
 import ContactPage from "@/pages/ContactPage";
 
@@ -31,6 +32,7 @@ function Router() {
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/orders" component={AdminOrders} />
       <Route path="/admin/orders/:id" component={AdminOrderDetail} />
+      <Route path="/admin/showcase-music" component={AdminShowcaseMusic} />
       <Route path="/about" component={AboutPage} />
       <Route path="/contact" component={ContactPage} />
       <Route component={NotFound} />
