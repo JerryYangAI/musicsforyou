@@ -118,12 +118,17 @@ export class MemStorage implements IStorage {
     const track: MusicTrack = {
       id,
       title: insertTrack.title,
+      titleEn: insertTrack.titleEn ?? null,
       description: insertTrack.description ?? null,
+      descriptionEn: insertTrack.descriptionEn ?? null,
+      genre: insertTrack.genre ?? null,
+      genreEn: insertTrack.genreEn ?? null,
       style: insertTrack.style ?? null,
       audioUrl: insertTrack.audioUrl,
       userId: insertTrack.userId ?? null,
       username: insertTrack.username,
       isPublic: insertTrack.isPublic ?? true,
+      isShowcase: insertTrack.isShowcase ?? false,
       createdAt: new Date(),
     };
     this.musicTracks.set(id, track);
@@ -236,7 +241,7 @@ export class DbStorage implements IStorage {
       .select()
       .from(musicTracks)
       .where(eq(musicTracks.isPublic, true))
-      .orderBy(desc(musicTracks.createdAt))
+      .orderBy(desc(musicTracks.isShowcase), desc(musicTracks.createdAt))
       .limit(limit);
     return tracks;
   }

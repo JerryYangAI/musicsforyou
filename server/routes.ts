@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import Stripe from "stripe";
-import { insertOrderSchema, insertReviewSchema } from "@shared/schema";
+import { insertOrderSchema, insertReviewSchema, insertMusicTrackSchema } from "@shared/schema";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import { ObjectPermission } from "./objectAcl";
 
@@ -192,7 +192,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Get public music tracks for the leaderboard
+  // Get public music tracks for the leaderboard (showcase tracks first)
   app.get("/api/music/public", async (req, res) => {
     try {
       const limit = parseInt(req.query.limit as string) || 10;
@@ -201,6 +201,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching music tracks:", error);
       res.status(500).json({ error: "Failed to fetch music tracks" });
+    }
+  });
+
+  // Admin: Add showcase music
+  app.post("/api/admin/showcase-music", requireAdmin, async (req, res) => {
+    try {
+      const trackData = insertMusicTrackSchema.parse({
+        ...req.body,
+        isShowcase: true,
+        isPublic: true,
+        userId: req.session.userId,
+      });
+
+      const track = await storage.createMusicTrack(trackData);
+      res.json(track);
+    } catch (error) {
+      console.error("Error creating showcase music:", error);
+      res.status(500).json({ error: "Failed to create showcase music" });
     }
   });
 

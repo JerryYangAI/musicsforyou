@@ -2,12 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "./LanguageProvider";
-import { Play, Pause } from "lucide-react";
+import { Play, Pause, Music2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import type { MusicTrack } from "@shared/schema";
 
 export function MusicLeaderboard() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const { data: tracks, isLoading } = useQuery<MusicTrack[]>({
     queryKey: ["/api/music/public"],
   });
@@ -125,20 +125,28 @@ export function MusicLeaderboard() {
                     )}
                   </Button>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-lg" data-testid={`text-title-${track.id}`}>
-                      {track.title}
-                    </h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-lg" data-testid={`text-title-${track.id}`}>
+                        {locale === "en" && track.titleEn ? track.titleEn : track.title}
+                      </h3>
+                      {track.isShowcase && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                          <Music2 className="h-3 w-3" />
+                          {locale === "en" ? "Showcase" : "展示"}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-sm text-muted-foreground" data-testid={`text-username-${track.id}`}>
                       {t.leaderboard.creator}：{track.username}
                     </p>
-                    {track.description && (
+                    {(track.description || track.descriptionEn) && (
                       <p className="text-sm text-muted-foreground mt-1" data-testid={`text-description-${track.id}`}>
-                        {track.description}
+                        {locale === "en" && track.descriptionEn ? track.descriptionEn : track.description}
                       </p>
                     )}
-                    {track.style && (
-                      <p className="text-xs text-muted-foreground mt-1" data-testid={`text-style-${track.id}`}>
-                        {t.leaderboard.style}：{track.style}
+                    {(track.genre || track.genreEn) && (
+                      <p className="text-xs text-muted-foreground mt-1" data-testid={`text-genre-${track.id}`}>
+                        {t.leaderboard.style}：{locale === "en" && track.genreEn ? track.genreEn : track.genre}
                       </p>
                     )}
                   </div>
