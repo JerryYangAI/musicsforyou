@@ -121,7 +121,7 @@ export default function AdminOrderDetail() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-muted-foreground">{t.admin.customer}</p>
-                  <p className="font-medium">{order.userId}</p>
+                  <p className="font-medium">{(order as any).username || order.userId}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">{t.admin.amount}</p>

@@ -16,6 +16,7 @@ import { useState } from "react";
 interface Order {
   id: string;
   userId: string;
+  username?: string;
   mood: string;
   style: string;
   description: string;
@@ -233,7 +234,7 @@ export default function AdminPage() {
                             {order.style} - {order.mood}
                           </CardTitle>
                           <CardDescription>
-                            {t.admin.customer}: User #{order.userId.slice(0, 8)}
+                            {t.admin.customer}: {order.username || `User #${order.userId.slice(0, 8)}`}
                           </CardDescription>
                         </div>
                         <div className="flex items-center gap-2">

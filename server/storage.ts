@@ -267,10 +267,29 @@ export class DbStorage implements IStorage {
     return order;
   }
 
-  async getOrder(orderId: string): Promise<Order | undefined> {
+  async getOrder(orderId: string): Promise<any | undefined> {
     const [order] = await db
-      .select()
+      .select({
+        id: orders.id,
+        userId: orders.userId,
+        username: users.username,
+        musicDescription: orders.musicDescription,
+        musicStyle: orders.musicStyle,
+        musicMoods: orders.musicMoods,
+        musicKeywords: orders.musicKeywords,
+        musicDuration: orders.musicDuration,
+        amount: orders.amount,
+        paymentMethod: orders.paymentMethod,
+        paymentStatus: orders.paymentStatus,
+        orderStatus: orders.orderStatus,
+        musicTrackId: orders.musicTrackId,
+        stripePaymentIntentId: orders.stripePaymentIntentId,
+        musicFileUrl: orders.musicFileUrl,
+        createdAt: orders.createdAt,
+        updatedAt: orders.updatedAt,
+      })
       .from(orders)
+      .leftJoin(users, eq(orders.userId, users.id))
       .where(eq(orders.id, orderId));
     return order;
   }
@@ -290,10 +309,29 @@ export class DbStorage implements IStorage {
   }
 
   // Admin methods implementation
-  async getAllOrders(): Promise<Order[]> {
+  async getAllOrders(): Promise<any[]> {
     const allOrders = await db
-      .select()
+      .select({
+        id: orders.id,
+        userId: orders.userId,
+        username: users.username,
+        musicDescription: orders.musicDescription,
+        musicStyle: orders.musicStyle,
+        musicMoods: orders.musicMoods,
+        musicKeywords: orders.musicKeywords,
+        musicDuration: orders.musicDuration,
+        amount: orders.amount,
+        paymentMethod: orders.paymentMethod,
+        paymentStatus: orders.paymentStatus,
+        orderStatus: orders.orderStatus,
+        musicTrackId: orders.musicTrackId,
+        stripePaymentIntentId: orders.stripePaymentIntentId,
+        musicFileUrl: orders.musicFileUrl,
+        createdAt: orders.createdAt,
+        updatedAt: orders.updatedAt,
+      })
       .from(orders)
+      .leftJoin(users, eq(orders.userId, users.id))
       .orderBy(desc(orders.createdAt));
     return allOrders;
   }
