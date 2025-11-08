@@ -10,8 +10,23 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { SelectOrder } from "@shared/schema";
 import { ArrowLeft } from "lucide-react";
+
+interface OrderDetail {
+  id: string;
+  userId: string;
+  username?: string;
+  musicStyle: string;
+  musicMood: string;
+  voiceType?: string;
+  duration?: number;
+  lyrics?: string;
+  songTitle?: string;
+  amount: number;
+  status: string;
+  musicFileUrl?: string;
+  createdAt: string;
+}
 
 const statusColorMap: Record<string, string> = {
   pending: "bg-yellow-500",
@@ -31,7 +46,7 @@ export default function AdminOrderDetail() {
   const [musicFileUrl, setMusicFileUrl] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
 
-  const { data: order, isLoading } = useQuery<SelectOrder>({
+  const { data: order, isLoading } = useQuery<OrderDetail>({
     queryKey: [`/api/admin/orders/${orderId}`],
     enabled: !!orderId,
   });
