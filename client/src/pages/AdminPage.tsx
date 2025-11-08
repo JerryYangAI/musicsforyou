@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { Download, Music, BarChart3, Package } from "lucide-react";
+import { Download, Music, BarChart3, Package, LogOut } from "lucide-react";
 import { useState } from "react";
 
 interface Order {
@@ -36,7 +36,7 @@ interface OrderStats {
 }
 
 export default function AdminPage() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { t } = useLanguage();
   const { toast } = useToast();
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
@@ -128,9 +128,19 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 p-6">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent" data-testid="text-admin-title">
-          {t.admin.title}
-        </h1>
+        <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent" data-testid="text-admin-title">
+            {t.admin.title}
+          </h1>
+          <Button 
+            variant="outline" 
+            onClick={logout}
+            data-testid="button-logout"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            {t.header.logout}
+          </Button>
+        </div>
 
         {/* Statistics Cards */}
         {stats && (
