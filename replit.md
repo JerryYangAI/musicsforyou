@@ -6,6 +6,44 @@
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
+## Current Issue Status (Nov 8, 2025)
+
+### Problem: Production Showcase Music Missing (3 out of 4 tracks)
+**Status**: In progress, user temporarily away
+
+**Issue Description**:
+- Production site (https://www.musicsforyou.com/) shows only 1 showcase music track ("夏日海风"/Summer Sea Breeze)
+- Should display 4 showcase tracks total
+- User ran SQL script `scripts/add-showcase-music-fixed.sql` in production database but only 1 track appeared
+
+**Root Cause (Diagnosed by Architect)**:
+- SQL script missing `user_id` field in INSERT statements
+- Schema requires both `username` AND `user_id` (foreign key to users table)
+- First 3 INSERTs likely failed due to NOT NULL constraint violation
+- Only 4th INSERT succeeded (or matched existing row)
+
+**Next Steps for Resolution**:
+1. Run diagnostic queries in production database to confirm:
+   - `SELECT COUNT(*) FROM music_tracks WHERE is_public = true AND is_showcase = true;`
+   - `SELECT title, title_en, audio_url, username, user_id, created_at FROM music_tracks WHERE is_showcase = true ORDER BY created_at DESC;`
+   - `SELECT id, username FROM users WHERE username = 'admin';`
+
+2. Two solution options presented to user:
+   - **Option A**: Generate corrected SQL script with proper `user_id` field (requires admin user ID from diagnostic query)
+   - **Option B**: Use admin UI at `/admin/showcase-music` to manually add the 3 missing tracks via form
+
+**Files Involved**:
+- `scripts/add-showcase-music-fixed.sql` - Current SQL script (has bug: missing user_id)
+- `client/src/pages/admin/AdminShowcaseMusic.tsx` - Admin UI for adding showcase music
+- `shared/schema.ts` - Database schema (music_tracks table requires user_id)
+- `server/routes.ts` - API endpoint for adding showcase music
+
+**Audio Files** (already deployed to production in `client/public/showcase-music/`):
+- `flying-trust.mp3`
+- `song-for-dingye.mp3`
+- `song-for-lijuan.mp3`
+- `summer-sea-breeze.mp3`
+
 ## System Architecture
 
 ### Frontend
