@@ -14,13 +14,9 @@ export function MusicLeaderboard() {
 
   const [playingId, setPlayingId] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
       if (audioRef.current) {
         audioRef.current.pause();
       }
@@ -32,16 +28,10 @@ export function MusicLeaderboard() {
       if (audioRef.current) {
         audioRef.current.pause();
       }
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
       setPlayingId(null);
     } else {
       if (audioRef.current) {
         audioRef.current.pause();
-      }
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
       }
 
       const audio = new Audio(track.audioUrl);
@@ -50,16 +40,8 @@ export function MusicLeaderboard() {
       audio.play();
       setPlayingId(track.id);
 
-      timeoutRef.current = setTimeout(() => {
-        audio.pause();
-        setPlayingId(null);
-      }, 10000);
-
       audio.addEventListener("ended", () => {
         setPlayingId(null);
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
       });
     }
   };
