@@ -39,15 +39,16 @@ Preferred communication style: Simple, everyday language.
 - **Music Customization**: Form with lyrics/keywords input, optional song title, voice type selection (male/female).
 - **Music Showcase Gallery**: Public gallery displaying demo tracks with bilingual descriptions (CN/EN).
   - Showcase tracks marked with special badge, prioritized in display order.
-  - 10-second audio preview with HTML5 Audio API.
-  - Showcase tracks (3 total):
-    1. "给鼎爷的歌" (Song for Dingye) - Pop/Light Rock/Tribute
-    2. "给丽娟的歌" (Song for Lijuan) - Pop Ballad/Acoustic/Sentimental
-    3. "夏日海风" (Summer Sea Breeze) - Light Music/Ocean Chill/Summer Pop
+  - Full audio playback with HTML5 Audio API (no time limit).
+  - Showcase tracks (4 total, newest first):
+    1. "飞行的信任" (Flying Trust) - Urban Pop/Electronic Chill/Melodic Groove
+    2. "给鼎爷的歌" (Song for Dingye) - Pop/Light Rock/Tribute
+    3. "给丽娟的歌" (Song for Lijuan) - Pop Ballad/Acoustic/Sentimental
+    4. "夏日海风" (Summer Sea Breeze) - Light Music/Ocean Chill/Summer Pop
 - **Order Management**: Users can view their own orders, admins can view all orders, update status, and upload music files.
 - **Payment Processing**: Stripe integration for credit card payments, WeChat Pay placeholder, order creation via `/api/orders`.
 - **User Profile**: Password change functionality with current password verification.
-- **Music Playback & Download**: HTML5 Audio API for 10-second previews, download for completed orders.
+- **Music Playback & Download**: HTML5 Audio API for full track playback on showcase music, download for completed orders.
 - **Review System**: 5-star rating, optional comments, unique per order, server-side validation for order ownership.
 - **Admin System**: Dashboard with statistics, order list with filtering, order detail page for drag-and-drop music file upload via Uppy and status management, showcase music management.
 
