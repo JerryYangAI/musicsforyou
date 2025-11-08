@@ -108,7 +108,13 @@ export class MemStorage implements IStorage {
   async getPublicMusicTracks(limit: number = 10): Promise<MusicTrack[]> {
     const tracks = Array.from(this.musicTracks.values())
       .filter(track => track.isPublic)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .sort((a, b) => {
+        // Showcase tracks first
+        if (a.isShowcase && !b.isShowcase) return -1;
+        if (!a.isShowcase && b.isShowcase) return 1;
+        // Then by creation date
+        return b.createdAt.getTime() - a.createdAt.getTime();
+      })
       .slice(0, limit);
     return tracks;
   }
