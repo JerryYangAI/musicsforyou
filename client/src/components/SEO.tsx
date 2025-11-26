@@ -156,6 +156,46 @@ export const pageSEO = {
       description: 'Manage your Your Melody account information and settings.',
     },
   },
+  payment: {
+    zh: {
+      title: '安全支付',
+      description: '完成您的音乐定制订单支付。支持信用卡和多种支付方式。',
+    },
+    en: {
+      title: 'Secure Payment',
+      description: 'Complete your music customization order payment. Supports credit cards and multiple payment methods.',
+    },
+  },
+  admin: {
+    zh: {
+      title: '管理后台',
+      description: '音为你管理后台 - 查看订单统计和管理平台。',
+    },
+    en: {
+      title: 'Admin Dashboard',
+      description: 'Your Melody admin dashboard - View order statistics and manage the platform.',
+    },
+  },
+  adminOrders: {
+    zh: {
+      title: '订单管理',
+      description: '管理所有音乐定制订单。',
+    },
+    en: {
+      title: 'Order Management',
+      description: 'Manage all music customization orders.',
+    },
+  },
+  adminShowcase: {
+    zh: {
+      title: '展示音乐管理',
+      description: '管理音乐展示榜单中的音乐。',
+    },
+    en: {
+      title: 'Showcase Music Management',
+      description: 'Manage music in the showcase gallery.',
+    },
+  },
 };
 
 export default SEO;

@@ -8,9 +8,10 @@ import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useLocation } from "wouter";
+import { SEO, pageSEO } from "@/components/SEO";
 
 export default function HomePage() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const { user } = useAuth();
   const [, setLocation] = useLocation();
 
@@ -22,8 +23,15 @@ export default function HomePage() {
     }
   };
   
+  const seo = pageSEO.home[locale];
+  
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO 
+        title={seo.title} 
+        description={seo.description} 
+        locale={locale} 
+      />
       <Header />
       <main className="flex-1">
         <HeroSection />

@@ -10,6 +10,7 @@ import { CreditCard, Smartphone, Lock } from "lucide-react";
 import { SiStripe, SiWechat } from "react-icons/si";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/components/LanguageProvider";
+import { SEO, pageSEO } from "@/components/SEO";
 
 type PaymentMethod = "stripe" | "wechat";
 
@@ -26,7 +27,8 @@ interface OrderDetails {
 export default function PaymentPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
+  const seo = pageSEO.payment[locale];
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>("stripe");
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
@@ -85,6 +87,11 @@ export default function PaymentPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title={seo.title} 
+        description={seo.description} 
+        locale={locale} 
+      />
       <Header />
       <div className="container mx-auto px-6 py-12">
         <div className="mb-8">

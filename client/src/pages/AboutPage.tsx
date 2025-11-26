@@ -3,9 +3,11 @@ import { Footer } from "@/components/Footer";
 import { useLanguage } from "@/components/LanguageProvider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Target, Users, Sparkles } from "lucide-react";
+import { SEO, pageSEO } from "@/components/SEO";
 
 export default function AboutPage() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
+  const seo = pageSEO.about[locale];
 
   const sections = [
     {
@@ -27,6 +29,11 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO 
+        title={seo.title} 
+        description={seo.description} 
+        locale={locale} 
+      />
       <Header />
       <main className="flex-1">
         <div className="container mx-auto px-6 py-16">

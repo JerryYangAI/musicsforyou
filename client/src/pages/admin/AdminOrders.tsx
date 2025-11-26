@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
-import type { SelectOrder } from "@shared/schema";
+import type { Order } from "@shared/schema";
+import { SEO, pageSEO } from "@/components/SEO";
 
 const statusColorMap: Record<string, string> = {
   pending: "bg-yellow-500",
@@ -16,9 +17,10 @@ const statusColorMap: Record<string, string> = {
 };
 
 export default function AdminOrders() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
+  const seo = pageSEO.adminOrders[locale];
 
-  const { data: orders, isLoading } = useQuery<SelectOrder[]>({
+  const { data: orders, isLoading } = useQuery<Order[]>({
     queryKey: ["/api/admin/orders"],
   });
 
@@ -32,6 +34,11 @@ export default function AdminOrders() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-purple-50">
+      <SEO 
+        title={seo.title} 
+        description={seo.description} 
+        locale={locale} 
+      />
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="mb-8 flex justify-between items-center">
           <div>

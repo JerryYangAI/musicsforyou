@@ -12,10 +12,12 @@ import { Separator } from "@/components/ui/separator";
 import { User, Lock, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { SEO, pageSEO } from "@/components/SEO";
 
 export default function ProfilePage() {
   const { user, isLoading } = useAuth();
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
+  const seo = pageSEO.profile[locale];
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
@@ -104,6 +106,11 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title={seo.title} 
+        description={seo.description} 
+        locale={locale} 
+      />
       <Header />
       <div className="container mx-auto px-6 py-12">
         <div className="max-w-2xl mx-auto space-y-6">

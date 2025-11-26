@@ -10,10 +10,12 @@ import { Mail, Clock, MapPin, MessageSquare } from "lucide-react";
 import whatsappQR from "@assets/What's APP QR_1762426755542.png";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { SEO, pageSEO } from "@/components/SEO";
 
 export default function ContactPage() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const { toast } = useToast();
+  const seo = pageSEO.contact[locale];
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -91,6 +93,11 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO 
+        title={seo.title} 
+        description={seo.description} 
+        locale={locale} 
+      />
       <Header />
       <main className="flex-1">
         <div className="container mx-auto px-6 py-16">

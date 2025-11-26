@@ -3,10 +3,14 @@ import { useLocation } from "wouter";
 import { Header } from "@/components/Header";
 import { OrderList } from "@/components/OrderList";
 import { useAuth } from "@/components/AuthProvider";
+import { useLanguage } from "@/components/LanguageProvider";
+import { SEO, pageSEO } from "@/components/SEO";
 
 export default function OrdersPage() {
   const { user, isLoading } = useAuth();
+  const { locale } = useLanguage();
   const [, setLocation] = useLocation();
+  const seo = pageSEO.orders[locale];
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -28,6 +32,11 @@ export default function OrdersPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title={seo.title} 
+        description={seo.description} 
+        locale={locale} 
+      />
       <Header />
       <div className="container mx-auto px-6 py-12">
         <OrderList />

@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { DollarSign, Package, Clock, CheckCircle2 } from "lucide-react";
 import { Link } from "wouter";
+import { SEO, pageSEO } from "@/components/SEO";
 
 interface OrderStats {
   totalOrders: number;
@@ -15,6 +16,7 @@ interface OrderStats {
 
 export default function AdminDashboard() {
   const { t, locale } = useLanguage();
+  const seo = pageSEO.admin[locale];
 
   const { data: stats, isLoading } = useQuery<OrderStats>({
     queryKey: ["/api/admin/stats"],
@@ -61,6 +63,11 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-purple-50">
+      <SEO 
+        title={seo.title} 
+        description={seo.description} 
+        locale={locale} 
+      />
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">{t.admin.title}</h1>
