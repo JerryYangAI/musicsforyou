@@ -76,8 +76,8 @@ export default function AdminOrders() {
                           <span className="font-mono text-sm text-muted-foreground">
                             #{order.id.slice(0, 8)}
                           </span>
-                          <Badge className={statusColorMap[order.status]}>
-                            {t.orders[order.status as keyof typeof t.orders] || order.status}
+                          <Badge className={statusColorMap[order.orderStatus]}>
+                            {t.orders[order.orderStatus as keyof typeof t.orders] || order.orderStatus}
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">
@@ -92,7 +92,7 @@ export default function AdminOrders() {
                       </div>
                       <div className="text-right">
                         <p className="text-lg font-semibold">
-                          ¥{(order.amount / 100).toFixed(2)}
+                          ¥{(Number(order.amount) / 100).toFixed(2)}
                         </p>
                         <Link href={`/admin/orders/${order.id}`}>
                           <Button size="sm" className="mt-2" data-testid={`button-view-order-${order.id}`}>
