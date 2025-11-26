@@ -257,10 +257,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         orderId: order.id,
         amount: Number(order.amount),
         musicStyle: order.musicStyle || undefined,
-        mood: order.mood || undefined,
-        lyrics: order.lyrics || undefined,
-        voiceType: order.voiceType || undefined,
-        songTitle: order.songTitle || undefined,
+        mood: order.musicMoods?.join(', ') || undefined,
+        lyrics: order.musicDescription || undefined,
         createdAt: order.createdAt,
       }).catch(err => console.error('[Email] Notification error:', err));
       

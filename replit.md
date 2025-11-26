@@ -8,6 +8,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates
 
+### Email Notification System - NEW (Nov 26, 2025)
+- **Feature**: Admin receives email notifications when new orders are placed
+- **Provider**: Resend (resend.com) - modern email API service
+- **Implementation**: `server/emailService.ts` with bilingual HTML email templates
+- **Secrets Required**: `RESEND_API_KEY`, `ADMIN_NOTIFICATION_EMAIL`
+- **Email Content**: Order ID, amount, music style, mood, description, direct link to admin panel
+
+### SEO & Analytics - NEW (Nov 26, 2025)
+- **SEO**: react-helmet-async for dynamic meta tags (title, description, Open Graph, Twitter Cards)
+- **Analytics**: Google Analytics 4 integration via `VITE_GA_MEASUREMENT_ID`
+- **Implementation**: `client/src/components/SEO.tsx`, `client/src/lib/analytics.ts`
+
 ### Showcase Music Issue - RESOLVED (Nov 26, 2025)
 - **Problem**: Production site showed only 1 of 4 showcase music tracks
 - **Root Cause**: SQL INSERT scripts were missing required `user_id` field
