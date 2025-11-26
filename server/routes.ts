@@ -427,7 +427,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Create payment intent for Stripe
+  // Create payment intent for Stripe (with WeChat Pay, Alipay support)
   app.post("/api/create-payment-intent", async (req, res) => {
     try {
       if (!req.session.userId) {
@@ -443,6 +443,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(amount), // Amount is already in cents from frontend
         currency: currency || "cny",
+        payment_method_configuration: "pmc_1SUNeS2Kpr72bl34tTfOqI2t",
         metadata: {
           userId: req.session.userId,
         },

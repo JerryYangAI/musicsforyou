@@ -8,6 +8,12 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates
 
+### Stripe Payment Configuration - UPDATED (Nov 26, 2025)
+- **Payment Methods**: Credit Card, WeChat Pay, Alipay integrated via Stripe Payment Element
+- **Configuration ID**: `pmc_1SUNeS2Kpr72bl34tTfOqI2t`
+- **Implementation**: Server-side `payment_method_configuration` parameter in PaymentIntent creation
+- **Frontend**: Simplified PaymentPage.tsx with auto-displaying payment methods via Stripe Elements
+
 ### Email Notification System - NEW (Nov 26, 2025)
 - **Feature**: Admin receives email notifications when new orders are placed
 - **Provider**: Resend (resend.com) - modern email API service

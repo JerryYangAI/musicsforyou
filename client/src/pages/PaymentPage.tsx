@@ -3,16 +3,11 @@ import { useLocation } from "wouter";
 import { Header } from "@/components/Header";
 import { StripePaymentForm } from "@/components/StripePaymentForm";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { CreditCard, Smartphone, Lock } from "lucide-react";
-import { SiStripe, SiWechat } from "react-icons/si";
+import { Lock, CreditCard, Smartphone, ShieldCheck } from "lucide-react";
+import { SiWechat, SiAlipay } from "react-icons/si";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/components/LanguageProvider";
 import { SEO, pageSEO } from "@/components/SEO";
-
-type PaymentMethod = "stripe" | "wechat";
 
 interface OrderDetails {
   musicStyle: string;
@@ -29,12 +24,9 @@ export default function PaymentPage() {
   const { toast } = useToast();
   const { t, locale } = useLanguage();
   const seo = pageSEO.payment[locale];
-  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>("stripe");
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
-  const [showPaymentForm, setShowPaymentForm] = useState(false);
 
   useEffect(() => {
-    // Get order details from sessionStorage
     const storedDetails = sessionStorage.getItem("orderDetails");
     if (!storedDetails) {
       toast({
@@ -60,20 +52,6 @@ export default function PaymentPage() {
     }
   }, []);
 
-  const handlePaymentMethodSelect = () => {
-    if (selectedMethod === "wechat") {
-      toast({
-        title: "微信支付",
-        description: "微信支付功能即将上线，敬请期待！",
-      });
-      return;
-    }
-
-    if (selectedMethod === "stripe") {
-      setShowPaymentForm(true);
-    }
-  };
-
   if (!orderDetails) {
     return (
       <div className="min-h-screen bg-background">
@@ -94,118 +72,108 @@ export default function PaymentPage() {
       />
       <Header />
       <div className="container mx-auto px-6 py-12">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">完成支付</h1>
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold mb-2">
+            {locale === 'zh' ? '完成支付' : 'Complete Payment'}
+          </h1>
           <p className="text-muted-foreground">
-            选择您的支付方式，完成后我们将立即开始为您生成音乐
+            {locale === 'zh' 
+              ? '选择您的支付方式，完成后我们将立即开始为您生成音乐' 
+              : 'Choose your payment method. We will start creating your music immediately after payment'}
           </p>
         </div>
 
-        <div className="max-w-2xl mx-auto">
-          {!showPaymentForm ? (
-            <Card>
-              <CardHeader>
-                <CardTitle>选择支付方式</CardTitle>
-                <CardDescription>安全可靠的支付保障</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <RadioGroup
-                  value={selectedMethod}
-                  onValueChange={(value) => setSelectedMethod(value as PaymentMethod)}
-                >
-                  {/* Stripe Payment */}
-                  <div
-                    className={`relative flex items-start space-x-4 p-4 rounded-lg border-2 transition-all cursor-pointer hover-elevate ${
-                      selectedMethod === "stripe"
-                        ? "border-primary bg-primary/5"
-                        : "border-border"
-                    }`}
-                    onClick={() => setSelectedMethod("stripe")}
-                    data-testid="card-payment-stripe"
-                  >
-                    <RadioGroupItem value="stripe" id="stripe" className="mt-1" />
-                    <div className="flex-1 space-y-2">
-                      <Label htmlFor="stripe" className="flex items-center gap-3 cursor-pointer">
-                        <div className="flex items-center gap-2">
-                          <SiStripe className="w-6 h-6 text-primary" />
-                          <span className="font-semibold">国际信用卡</span>
-                        </div>
-                        <div className="flex gap-2">
-                          <CreditCard className="w-4 h-4 text-muted-foreground" />
-                        </div>
-                      </Label>
-                      <p className="text-sm text-muted-foreground">
-                        支持 Visa、Mastercard、American Express 等国际信用卡
-                      </p>
-                    </div>
-                  </div>
+        <div className="max-w-2xl mx-auto space-y-6">
+          {/* Supported Payment Methods */}
+          <div className="flex flex-wrap items-center justify-center gap-4 p-4 bg-accent/30 rounded-lg">
+            <span className="text-sm text-muted-foreground mr-2">
+              {locale === 'zh' ? '支持的支付方式：' : 'Supported payment methods:'}
+            </span>
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <CreditCard className="w-5 h-5" />
+              <span className="text-sm">{locale === 'zh' ? '信用卡' : 'Card'}</span>
+            </div>
+            <div className="flex items-center gap-1 text-[#07C160]">
+              <SiWechat className="w-5 h-5" />
+              <span className="text-sm">{locale === 'zh' ? '微信支付' : 'WeChat Pay'}</span>
+            </div>
+            <div className="flex items-center gap-1 text-[#1677FF]">
+              <SiAlipay className="w-5 h-5" />
+              <span className="text-sm">{locale === 'zh' ? '支付宝' : 'Alipay'}</span>
+            </div>
+          </div>
 
-                  {/* WeChat Pay */}
-                  <div
-                    className={`relative flex items-start space-x-4 p-4 rounded-lg border-2 transition-all cursor-pointer hover-elevate ${
-                      selectedMethod === "wechat"
-                        ? "border-primary bg-primary/5"
-                        : "border-border"
-                    }`}
-                    onClick={() => setSelectedMethod("wechat")}
-                    data-testid="card-payment-wechat"
-                  >
-                    <RadioGroupItem value="wechat" id="wechat" className="mt-1" />
-                    <div className="flex-1 space-y-2">
-                      <Label htmlFor="wechat" className="flex items-center gap-3 cursor-pointer">
-                        <div className="flex items-center gap-2">
-                          <SiWechat className="w-6 h-6 text-[#07C160]" />
-                          <span className="font-semibold">微信支付</span>
-                        </div>
-                        <div className="flex gap-2">
-                          <Smartphone className="w-4 h-4 text-muted-foreground" />
-                        </div>
-                      </Label>
-                      <p className="text-sm text-muted-foreground">
-                        使用微信扫码支付，快速便捷（即将上线）
-                      </p>
-                    </div>
-                  </div>
-                </RadioGroup>
-
-                {/* Price Display */}
-                <div className="bg-accent/50 p-4 rounded-lg">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-muted-foreground">订单金额</span>
-                    <span className="text-2xl font-bold">¥{orderDetails.amount}</span>
-                  </div>
-                  <div className="text-xs text-muted-foreground">包含音乐生成及下载服务</div>
+          {/* Order Summary */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">
+                {locale === 'zh' ? '订单摘要' : 'Order Summary'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">
+                    {locale === 'zh' ? '音乐风格' : 'Music Style'}
+                  </span>
+                  <span>{orderDetails.musicStyle}</span>
                 </div>
-
-                {/* Continue Button */}
-                <Button
-                  className="w-full"
-                  size="lg"
-                  onClick={handlePaymentMethodSelect}
-                  data-testid="button-continue-payment"
-                >
-                  <Lock className="w-5 h-5 mr-2" />
-                  继续支付 ¥{orderDetails.amount}
-                </Button>
-
-                {/* Security Notice */}
-                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                  <Lock className="w-3 h-3" />
-                  <span>支付信息经过加密保护</span>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">
+                    {locale === 'zh' ? '情感氛围' : 'Mood'}
+                  </span>
+                  <span>{orderDetails.musicMoods.join(', ')}</span>
                 </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle>信用卡支付</CardTitle>
-                <CardDescription>请填写您的信用卡信息</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <StripePaymentForm orderDetails={orderDetails} />
-              </CardContent>
-            </Card>
-          )}
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">
+                    {locale === 'zh' ? '时长' : 'Duration'}
+                  </span>
+                  <span>{orderDetails.musicDuration}s</span>
+                </div>
+                <div className="border-t pt-2 mt-2">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">
+                      {locale === 'zh' ? '应付金额' : 'Total'}
+                    </span>
+                    <span className="text-2xl font-bold text-primary">
+                      ¥{orderDetails.amount}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Payment Form */}
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                {locale === 'zh' ? '选择支付方式' : 'Choose Payment Method'}
+              </CardTitle>
+              <CardDescription>
+                {locale === 'zh' 
+                  ? '支持信用卡、微信支付、支付宝等多种支付方式' 
+                  : 'Supports credit card, WeChat Pay, Alipay and more'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <StripePaymentForm orderDetails={orderDetails} />
+            </CardContent>
+          </Card>
+
+          {/* Security Notice */}
+          <div className="flex items-center justify-center gap-3 p-4 bg-accent/20 rounded-lg">
+            <ShieldCheck className="w-5 h-5 text-green-600" />
+            <div className="text-sm text-muted-foreground">
+              <span className="font-medium text-foreground">
+                {locale === 'zh' ? '安全支付保障' : 'Secure Payment'}
+              </span>
+              {' · '}
+              {locale === 'zh' 
+                ? '您的支付信息经过 256 位 SSL 加密保护' 
+                : 'Your payment is protected with 256-bit SSL encryption'}
+            </div>
+          </div>
         </div>
       </div>
     </div>
