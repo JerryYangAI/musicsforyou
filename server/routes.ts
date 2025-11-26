@@ -7,6 +7,7 @@ import Stripe from "stripe";
 import { insertOrderSchema, insertReviewSchema, insertMusicTrackSchema } from "@shared/schema";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import { ObjectPermission } from "./objectAcl";
+import { sendOrderNotification } from "./emailService";
 
 // Use test key in development, production key in production
 const stripeSecretKey = process.env.NODE_ENV === 'production' 
@@ -250,6 +251,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       const order = await storage.createOrder(orderData);
+      
+      // Send email notification to admin (non-blocking)
+      sendOrderNotification({
+        orderId: order.id,
+        amount: Number(order.amount),
+        musicStyle: order.musicStyle || undefined,
+        mood: order.mood || undefined,
+        lyrics: order.lyrics || undefined,
+        voiceType: order.voiceType || undefined,
+        songTitle: order.songTitle || undefined,
+        createdAt: order.createdAt,
+      }).catch(err => console.error('[Email] Notification error:', err));
+      
       res.json(order);
     } catch (error) {
       console.error("Error creating order:", error);
