@@ -135,7 +135,7 @@ export async function sendOrderNotification(order: OrderDetails): Promise<boolea
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Your Melody <noreply@musicsforyou.com>',
+      from: 'Your Melody <onboarding@resend.dev>',
       to: [adminEmail],
       subject: `🎵 新订单通知 - ¥${formattedAmount} - #${order.orderId.slice(0, 8).toUpperCase()}`,
       html: emailHtml,
@@ -216,7 +216,7 @@ export async function sendOrderStatusUpdate(
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Your Melody <noreply@musicsforyou.com>',
+      from: 'Your Melody <onboarding@resend.dev>',
       to: [customerEmail],
       subject: `🎵 订单状态更新 - ${status.zh} / ${status.en} - #${orderId.slice(0, 8).toUpperCase()}`,
       html: emailHtml,
