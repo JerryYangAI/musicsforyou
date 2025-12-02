@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type MusicTrack, type InsertMusicTrack, type Order, type Review, type InsertReview, users, musicTracks, orders, reviews } from "@shared/schema";
+import { type User, type InsertUser, type MusicTrack, type InsertMusicTrack, type Order, type Review, type InsertReview, type MusicGenerationTask, type InsertMusicGenerationTask, users, musicTracks, orders, reviews, musicGenerationTasks } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
 import { eq, desc, and, gte, lte, sql } from "drizzle-orm";
@@ -34,6 +34,16 @@ export interface IStorage {
     totalRevenue: string;
     avgOrderValue: string;
   }>;
+  // Music Generation Task methods
+  createMusicGenerationTask(taskData: InsertMusicGenerationTask): Promise<MusicGenerationTask>;
+  getMusicGenerationTaskByOrderId(orderId: string): Promise<MusicGenerationTask | undefined>;
+  updateMusicGenerationTaskProgress(
+    taskId: string,
+    progress: number,
+    status?: string,
+    audioUrl?: string,
+    errorMessage?: string
+  ): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -420,6 +430,55 @@ export class DbStorage implements IStorage {
       totalRevenue: totalRevenue.toFixed(2),
       avgOrderValue,
     };
+  }
+
+  // Music Generation Task methods
+  async createMusicGenerationTask(taskData: InsertMusicGenerationTask): Promise<MusicGenerationTask> {
+    const [task] = await db.insert(musicGenerationTasks).values(taskData).returning();
+    return task;
+  }
+
+  async getMusicGenerationTaskByOrderId(orderId: string): Promise<MusicGenerationTask | undefined> {
+    const [task] = await db
+      .select()
+      .from(musicGenerationTasks)
+      .where(eq(musicGenerationTasks.orderId, orderId))
+      .orderBy(desc(musicGenerationTasks.createdAt))
+      .limit(1);
+    return task;
+  }
+
+  async updateMusicGenerationTaskProgress(
+    taskId: string,
+    progress: number,
+    status?: string,
+    audioUrl?: string,
+    errorMessage?: string
+  ): Promise<void> {
+    const updateData: any = {
+      progress,
+      updatedAt: new Date(),
+    };
+    
+    if (status) {
+      updateData.status = status;
+      if (status === "completed") {
+        updateData.completedAt = new Date();
+      }
+    }
+    
+    if (audioUrl) {
+      updateData.audioUrl = audioUrl;
+    }
+    
+    if (errorMessage) {
+      updateData.errorMessage = errorMessage;
+    }
+
+    await db
+      .update(musicGenerationTasks)
+      .set(updateData)
+      .where(eq(musicGenerationTasks.id, taskId));
   }
 }
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLanguage } from "./LanguageProvider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { Music, Loader2, Download, Clock, Play, Pause, Star } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -31,6 +32,8 @@ export function OrderList() {
   const [audioElements, setAudioElements] = useState<{ [key: string]: HTMLAudioElement }>({});
   const [reviewForms, setReviewForms] = useState<ReviewFormState>({});
   const [orderReviews, setOrderReviews] = useState<{ [orderId: string]: SelectReview }>({});
+  const [generationProgress, setGenerationProgress] = useState<{ [orderId: string]: { progress: number; status: string } }>({});
+  const progressIntervals = useRef<{ [orderId: string]: NodeJS.Timeout }>({});
 
   // Cleanup audio on unmount
   useEffect(() => {
@@ -57,6 +60,59 @@ export function OrderList() {
           // Review doesn't exist yet, which is fine
         }
       });
+  }, [orders]);
+
+  // Poll generation progress for processing orders
+  useEffect(() => {
+    const processingOrders = orders.filter(o => o.orderStatus === "processing" || o.orderStatus === "pending");
+    
+    processingOrders.forEach((order) => {
+      // Clear existing interval if any
+      if (progressIntervals.current[order.id]) {
+        clearInterval(progressIntervals.current[order.id]);
+      }
+
+      // Start polling
+      const pollProgress = async () => {
+        try {
+          const response = await fetch(`/api/music/generation/${order.id}/status`);
+          if (response.ok) {
+            const data = await response.json();
+            setGenerationProgress(prev => ({
+              ...prev,
+              [order.id]: { progress: data.progress || 0, status: data.status || order.orderStatus }
+            }));
+
+            // If completed or failed, stop polling and refresh orders
+            if (data.status === "completed" || data.status === "failed") {
+              clearInterval(progressIntervals.current[order.id]);
+              delete progressIntervals.current[order.id];
+              queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+            }
+          }
+        } catch (error) {
+          console.error("Error polling generation progress:", error);
+        }
+      };
+
+      // Poll immediately, then every 3 seconds
+      pollProgress();
+      progressIntervals.current[order.id] = setInterval(pollProgress, 3000);
+    });
+
+    // Cleanup: clear intervals for orders that are no longer processing
+    Object.keys(progressIntervals.current).forEach((orderId) => {
+      const order = orders.find(o => o.id === orderId);
+      if (!order || (order.orderStatus !== "processing" && order.orderStatus !== "pending")) {
+        clearInterval(progressIntervals.current[orderId]);
+        delete progressIntervals.current[orderId];
+      }
+    });
+
+    // Cleanup on unmount
+    return () => {
+      Object.values(progressIntervals.current).forEach(interval => clearInterval(interval));
+    };
   }, [orders]);
 
   const getStatusColor = (status: string) => {
@@ -190,6 +246,20 @@ export function OrderList() {
             <span className="font-semibold" data-testid={`text-amount-${order.id}`}>${order.amount}</span>
           </div>
         </div>
+
+        {/* Music Generation Progress */}
+        {(order.orderStatus === "processing" || order.orderStatus === "pending") && generationProgress[order.id] && (
+          <div className="space-y-2 pt-2 border-t">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                {t.orders.generating || "生成中..."}
+              </span>
+              <span className="font-medium">{generationProgress[order.id].progress}%</span>
+            </div>
+            <Progress value={generationProgress[order.id].progress} className="h-2" />
+          </div>
+        )}
 
         {order.musicFileUrl && (
           <div className="pt-3 border-t space-y-3">

@@ -88,3 +88,27 @@ export const insertReviewSchema = createInsertSchema(reviews).omit({
 
 export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type Review = typeof reviews.$inferSelect;
+
+export const musicGenerationTasks = pgTable("music_generation_tasks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  orderId: varchar("order_id").references(() => orders.id).notNull(),
+  taskId: varchar("task_id"), // Suno API返回的任务ID
+  status: varchar("status").default("pending").notNull(), // pending, processing, completed, failed
+  progress: integer("progress").default(0), // 0-100
+  prompt: text("prompt").notNull(), // 生成提示词
+  audioUrl: text("audio_url"), // 生成的音频URL
+  errorMessage: text("error_message"), // 错误信息
+  retryCount: integer("retry_count").default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  completedAt: timestamp("completed_at"),
+});
+
+export const insertMusicGenerationTaskSchema = createInsertSchema(musicGenerationTasks).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertMusicGenerationTask = z.infer<typeof insertMusicGenerationTaskSchema>;
+export type MusicGenerationTask = typeof musicGenerationTasks.$inferSelect;

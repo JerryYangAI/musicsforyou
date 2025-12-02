@@ -1,3 +1,8 @@
+// 首先加载环境变量
+import { config } from "dotenv";
+import { resolve } from "path";
+config({ path: resolve(process.cwd(), ".env") });
+
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import { registerRoutes } from "./routes";
@@ -61,6 +66,16 @@ app.use((req, res, next) => {
     res.status(status).json({ message });
     throw err;
   });
+
+  // Start music generation worker
+  try {
+    const { createMusicGenerationWorker } = await import("./worker");
+    const worker = createMusicGenerationWorker();
+    log("Music generation worker started");
+  } catch (error) {
+    console.error("Failed to start music generation worker:", error);
+    // 不阻塞服务器启动，但记录错误
+  }
 
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route

@@ -174,6 +174,7 @@ export const en: Translations = {
     reviewSubmitted: "Review submitted",
     reviewFailed: "Failed to submit review",
     alreadyReviewed: "You have already reviewed this order",
+    generating: "Generating Music",
   },
 
   admin: {

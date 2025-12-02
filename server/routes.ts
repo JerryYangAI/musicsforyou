@@ -10,17 +10,25 @@ import { ObjectPermission } from "./objectAcl";
 import { sendOrderNotification } from "./emailService";
 
 // Use test key in development, production key in production
+// Stripe密钥是可选的，只有在实际使用支付功能时才需要
 const stripeSecretKey = process.env.NODE_ENV === 'production' 
   ? process.env.STRIPE_SECRET_KEY 
   : process.env.TESTING_STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY;
 
-if (!stripeSecretKey) {
-  throw new Error('Missing required Stripe secret key');
-}
+// 延迟初始化Stripe，只有在实际使用时才检查密钥
+let stripe: Stripe | null = null;
 
-const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: "2025-09-30.clover",
-});
+function getStripe(): Stripe {
+  if (!stripe) {
+    if (!stripeSecretKey) {
+      throw new Error('Missing required Stripe secret key. Please set STRIPE_SECRET_KEY or TESTING_STRIPE_SECRET_KEY in .env');
+    }
+    stripe = new Stripe(stripeSecretKey, {
+      apiVersion: "2025-09-30.clover",
+    });
+  }
+  return stripe;
+}
 
 // Admin middleware
 async function requireAdmin(req: any, res: any, next: any) {
@@ -262,6 +270,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdAt: order.createdAt,
       }).catch(err => console.error('[Email] Notification error:', err));
       
+      // Trigger music generation task if payment is successful
+      if (order.paymentStatus === "paid" && order.orderStatus === "processing") {
+        try {
+          const { musicGenerationQueue } = await import("./queue");
+          
+          await musicGenerationQueue.add(
+            "generate-music",
+            {
+              orderId: order.id,
+              userId: order.userId,
+              musicDescription: order.musicDescription,
+              musicStyle: order.musicStyle,
+              musicMoods: order.musicMoods,
+              musicKeywords: order.musicKeywords || [],
+              musicDuration: order.musicDuration,
+              songTitle: order.musicDescription.substring(0, 50), // 使用描述的前50个字符作为标题
+              voiceType: "male", // 可以从订单数据中获取，这里先默认male
+            },
+            {
+              priority: 1, // 高优先级
+              attempts: 3, // 最多重试3次
+              backoff: {
+                type: "exponential",
+                delay: 5000, // 初始延迟5秒
+              },
+            }
+          );
+          
+          console.log(`[API] Music generation task queued for order ${order.id}`);
+        } catch (error) {
+          console.error(`[API] Failed to queue music generation task:`, error);
+          // 不阻塞订单创建，记录错误即可
+        }
+      }
+      
       res.json(order);
     } catch (error) {
       console.error("Error creating order:", error);
@@ -434,25 +477,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Not authenticated" });
       }
       
-      const { amount, currency } = req.body;
+      const { amount, currency, paymentMethod } = req.body;
       
       if (!amount || amount <= 0) {
         return res.status(400).json({ error: "Invalid amount" });
+      }
+
+      const stripe = getStripe();
+      
+      // 根据支付方式设置payment_method_types
+      let paymentMethodTypes: string[] = [];
+      let paymentMethodOptions: any = {};
+      
+      if (paymentMethod === "wechat") {
+        paymentMethodTypes = ["wechat_pay"];
+        paymentMethodOptions = {
+          wechat_pay: {
+            client: "web",
+          },
+        };
+      } else if (paymentMethod === "alipay") {
+        paymentMethodTypes = ["alipay"];
+      } else {
+        // 默认支持信用卡、微信支付和支付宝
+        paymentMethodTypes = ["card", "wechat_pay", "alipay"];
       }
       
       const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(amount), // Amount is already in cents from frontend
         currency: currency || "cny",
-        payment_method_configuration: "pmc_1SUNeS2Kpr72bl34tTfOqI2t",
+        payment_method_types: paymentMethodTypes,
+        payment_method_configuration: process.env.STRIPE_PAYMENT_METHOD_CONFIGURATION || "pmc_1SUNeS2Kpr72bl34tTfOqI2t",
+        payment_method_options: Object.keys(paymentMethodOptions).length > 0 ? paymentMethodOptions : undefined,
         metadata: {
           userId: req.session.userId,
+          paymentMethod: paymentMethod || "card",
         },
       });
       
-      res.json({ clientSecret: paymentIntent.client_secret });
+      res.json({ 
+        clientSecret: paymentIntent.client_secret,
+        paymentIntentId: paymentIntent.id,
+      });
     } catch (error: any) {
       console.error("Error creating payment intent:", error);
       res.status(500).json({ error: "Error creating payment intent: " + error.message });
+    }
+  });
+
+  // Get payment intent status (for WeChat Pay and Alipay polling)
+  app.get("/api/payment-intent/:paymentIntentId/status", async (req, res) => {
+    try {
+      if (!req.session.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const { paymentIntentId } = req.params;
+      const stripe = getStripe();
+      
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      
+      // Verify the payment intent belongs to the user
+      if (paymentIntent.metadata.userId !== req.session.userId) {
+        return res.status(403).json({ error: "Not authorized" });
+      }
+
+      // Get next action if available (for QR code display)
+      let nextAction = null;
+      if (paymentIntent.next_action) {
+        nextAction = paymentIntent.next_action;
+      }
+
+      res.json({
+        status: paymentIntent.status,
+        paymentMethod: paymentIntent.payment_method_types[0],
+        nextAction: nextAction,
+        clientSecret: paymentIntent.client_secret,
+      });
+    } catch (error: any) {
+      console.error("Error retrieving payment intent:", error);
+      res.status(500).json({ error: "Error retrieving payment intent: " + error.message });
     }
   });
 
@@ -495,6 +599,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error getting upload URL:", error);
       res.status(500).json({ error: "Failed to get upload URL: " + error.message });
+    }
+  });
+
+  // Get music generation status for an order
+  app.get("/api/music/generation/:orderId/status", async (req, res) => {
+    try {
+      if (!req.session.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const { orderId } = req.params;
+      
+      // Verify order belongs to user
+      const order = await storage.getOrder(orderId);
+      if (!order) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+      
+      if (order.userId !== req.session.userId) {
+        return res.status(403).json({ error: "Not authorized" });
+      }
+
+      // Get generation task
+      const task = await storage.getMusicGenerationTaskByOrderId(orderId);
+      
+      if (!task) {
+        return res.json({
+          orderId,
+          status: order.orderStatus,
+          progress: 0,
+        });
+      }
+
+      res.json({
+        orderId,
+        status: task.status,
+        progress: task.progress || 0,
+        audioUrl: task.audioUrl || order.musicFileUrl,
+        errorMessage: task.errorMessage,
+      });
+    } catch (error) {
+      console.error("Error fetching generation status:", error);
+      res.status(500).json({ error: "Failed to fetch generation status" });
+    }
+  });
+
+  // Retry failed music generation (admin only)
+  app.post("/api/music/generation/:orderId/retry", requireAdmin, async (req, res) => {
+    try {
+      const { orderId } = req.params;
+      
+      const order = await storage.getOrder(orderId);
+      if (!order) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+
+      if (order.orderStatus !== "failed") {
+        return res.status(400).json({ error: "Order is not in failed state" });
+      }
+
+      // Update order status to processing
+      await storage.updateOrderStatus(orderId, "processing");
+
+      // Queue new generation task
+      const { musicGenerationQueue } = await import("./queue");
+      
+      await musicGenerationQueue.add(
+        "generate-music",
+        {
+          orderId: order.id,
+          userId: order.userId,
+          musicDescription: order.musicDescription,
+          musicStyle: order.musicStyle,
+          musicMoods: order.musicMoods,
+          musicKeywords: order.musicKeywords || [],
+          musicDuration: order.musicDuration,
+          songTitle: order.musicDescription.substring(0, 50),
+        },
+        {
+          priority: 1,
+          attempts: 3,
+          backoff: {
+            type: "exponential",
+            delay: 5000,
+          },
+        }
+      );
+
+      res.json({ success: true, message: "Retry task queued" });
+    } catch (error) {
+      console.error("Error retrying generation:", error);
+      res.status(500).json({ error: "Failed to retry generation" });
     }
   });
 

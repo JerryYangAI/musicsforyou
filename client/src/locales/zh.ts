@@ -172,6 +172,7 @@ export const zh = {
     reviewSubmitted: "评价已提交",
     reviewFailed: "评价提交失败",
     alreadyReviewed: "您已评价过此订单",
+    generating: "音乐生成中",
   },
 
   admin: {
