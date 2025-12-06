@@ -23,6 +23,8 @@ import AdminOrderDetail from "@/pages/admin/AdminOrderDetail";
 import AdminShowcaseMusic from "@/pages/admin/AdminShowcaseMusic";
 import AboutPage from "@/pages/AboutPage";
 import ContactPage from "@/pages/ContactPage";
+import SunoDemo from "@/pages/SunoDemo";
+import MyWorks from "@/pages/MyWorks";
 
 function Router() {
   useAnalytics();
@@ -41,6 +43,8 @@ function Router() {
       <Route path="/admin/showcase-music" component={AdminShowcaseMusic} />
       <Route path="/about" component={AboutPage} />
       <Route path="/contact" component={ContactPage} />
+      <Route path="/suno-demo" component={SunoDemo} />
+      <Route path="/my-works" component={MyWorks} />
       <Route component={NotFound} />
     </Switch>
   );

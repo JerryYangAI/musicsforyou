@@ -22,7 +22,8 @@ const stripePublicKey = import.meta.env.MODE === 'production'
   ? import.meta.env.VITE_STRIPE_PUBLIC_KEY
   : import.meta.env.TESTING_VITE_STRIPE_PUBLIC_KEY || import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 
-const stripePromise = loadStripe(stripePublicKey!);
+// 只有在公钥存在时才初始化 Stripe，避免 undefined 导致的错误
+const stripePromise = stripePublicKey ? loadStripe(stripePublicKey) : null;
 
 interface OrderDetails {
   musicStyle: string;

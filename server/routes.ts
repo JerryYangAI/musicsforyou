@@ -8,6 +8,13 @@ import { insertOrderSchema, insertReviewSchema, insertMusicTrackSchema } from "@
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import { ObjectPermission } from "./objectAcl";
 import { sendOrderNotification } from "./emailService";
+import {
+  generateMusic,
+  fetchMusicResult,
+  SunoApiError,
+  type GenerateMusicParams,
+} from "./sunoApiClient";
+import trackStore, { type Track } from "./trackStore";
 
 // Use test key in development, production key in production
 // Stripe密钥是可选的，只有在实际使用支付功能时才需要
@@ -210,6 +217,360 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching music tracks:", error);
       res.status(500).json({ error: "Failed to fetch music tracks" });
+    }
+  });
+
+  // ============ Suno API 音乐生成接口 ============
+
+  // 参数校验 Schema
+  const generateMusicSchema = z.object({
+    prompt: z.string().min(1, "prompt 不能为空"),
+    title: z.string().optional(),
+    model: z.string().optional(), // 新的模型字段：V3_5, V4, V4_5, V4_5ALL, V4_5PLUS, V5
+    mv: z.string().nullable().optional(), // 兼容旧的 mv 字段
+    instrumental: z.boolean().optional().default(false),
+  });
+
+  /**
+   * POST /api/music/generate
+   * 提交生成歌曲任务
+   *
+   * 请求体:
+   * {
+   *   "prompt": "string",       // 必填，生成音乐的文案提示词
+   *   "title": "string",        // 可选，歌曲标题
+   *   "mv": "string | null",    // 可选，Suno 模型版本
+   *   "instrumental": boolean   // 可选，是否纯伴奏，默认 false
+   * }
+   *
+   * 返回:
+   * {
+   *   "success": true,
+   *   "taskId": "string",
+   *   "raw": { ... }
+   * }
+   */
+  app.post("/api/music/generate", async (req, res) => {
+    try {
+      // 参数校验
+      const parseResult = generateMusicSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        const errorMsg = parseResult.error.errors
+          .map((e) => e.message)
+          .join(", ");
+        return res.status(400).json({
+          success: false,
+          error: `参数校验失败: ${errorMsg}`,
+        });
+      }
+
+      const params: GenerateMusicParams = {
+        prompt: parseResult.data.prompt,
+        title: parseResult.data.title,
+        model: parseResult.data.model, // 新的模型字段
+        mv: parseResult.data.mv ?? undefined, // 兼容旧的 mv 字段
+        instrumental: parseResult.data.instrumental,
+      };
+
+      // 调用 Suno API
+      const result = await generateMusic(params);
+
+      res.json({
+        success: true,
+        taskId: result.taskId,
+        raw: result.raw,
+      });
+    } catch (error) {
+      console.error("[API] /api/music/generate error:", error);
+
+      if (error instanceof SunoApiError) {
+        const statusCode = error.statusCode || 500;
+        return res.status(statusCode >= 400 && statusCode < 600 ? statusCode : 500).json({
+          success: false,
+          error: error.message,
+        });
+      }
+
+      res.status(500).json({
+        success: false,
+        error: `生成音乐失败: ${(error as Error).message}`,
+      });
+    }
+  });
+
+  /**
+   * GET /api/music/result?taskId=xxx
+   * 根据 taskId 查询生成结果
+   *
+   * 查询参数:
+   * - taskId: string (必填)
+   *
+   * 返回:
+   * {
+   *   "success": true,
+   *   "status": "pending | generating | finished | failed",
+   *   "audioUrl": "string | null",         // 主要音频 URL
+   *   "sourceAudioUrl": "string | null",   // 源音频 URL（备选）
+   *   "imageUrl": "string | null",         // 封面图片 URL
+   *   "sourceImageUrl": "string | null",   // 源图片 URL（备选）
+   *   "videoUrl": "string | null",         // 视频 URL
+   *   "sourceVideoUrl": "string | null",   // 源视频 URL（备选）
+   *   "title": "string | null",            // 歌曲标题
+   *   "prompt": "string | null",           // 生成提示词
+   *   "duration": number | null,           // 时长（秒）
+   *   "tags": "string | null",             // 风格标签
+   *   "modelName": "string | null",        // 使用的模型
+   *   "raw": { ... }
+   * }
+   *
+   * 状态映射逻辑：
+   * - 如果 sunoData 中存在非空 audioUrl，则 status 为 "finished"
+   * - 否则根据原始状态：PENDING -> "pending", TEXT_SUCCESS/FIRST_SUCCESS -> "generating", 错误状态 -> "failed"
+   */
+  app.get("/api/music/result", async (req, res) => {
+    try {
+      const taskId = req.query.taskId as string;
+
+      if (!taskId || taskId.trim() === "") {
+        return res.status(400).json({
+          success: false,
+          error: "taskId 参数不能为空",
+        });
+      }
+
+      // 调用 Suno API 查询结果
+      const result = await fetchMusicResult(taskId);
+
+      // 当生成完成且有音频 URL 时，保存到 Track 存储
+      if (result.status === "finished" && result.audioUrl) {
+        try {
+          // 先检查是否已存在（幂等性）
+          const existingTrack = await trackStore.getTrackByTaskId(taskId);
+          
+          if (!existingTrack) {
+            // 组装 Track 对象
+            const track: Track = {
+              id: taskId,
+              taskId: taskId,
+              title: result.title || "未命名作品",
+              prompt: result.prompt || "",
+              audioUrl: result.audioUrl,
+              imageUrl: result.imageUrl || null,
+              duration: result.duration || null,
+              tags: result.tags || null,
+              modelName: result.modelName || null,
+              createdAt: new Date().toISOString(),
+              userId: "guest", // 暂时使用固定值
+              isPublic: true,  // 默认公开
+            };
+
+            // 保存到存储
+            await trackStore.saveTrack(track);
+            console.log(`[API] Track 已保存: ${taskId}`);
+          }
+        } catch (saveError) {
+          // 保存失败不影响正常响应，只记录日志
+          console.error("[API] 保存 Track 失败:", saveError);
+        }
+      }
+
+      res.json({
+        success: true,
+        status: result.status,
+        // 音频 URL
+        audioUrl: result.audioUrl,
+        sourceAudioUrl: result.sourceAudioUrl,
+        // 图片 URL
+        imageUrl: result.imageUrl,
+        sourceImageUrl: result.sourceImageUrl,
+        // 视频 URL
+        videoUrl: result.videoUrl,
+        sourceVideoUrl: result.sourceVideoUrl,
+        // 元数据
+        title: result.title,
+        prompt: result.prompt,
+        duration: result.duration,
+        tags: result.tags,
+        modelName: result.modelName,
+        // 原始数据
+        raw: result.raw,
+      });
+    } catch (error) {
+      console.error("[API] /api/music/result error:", error);
+
+      if (error instanceof SunoApiError) {
+        const statusCode = error.statusCode || 500;
+        return res.status(statusCode >= 400 && statusCode < 600 ? statusCode : 500).json({
+          success: false,
+          error: error.message,
+        });
+      }
+
+      res.status(500).json({
+        success: false,
+        error: `查询生成结果失败: ${(error as Error).message}`,
+      });
+    }
+  });
+
+  /**
+   * POST /api/music/webhook
+   * SunoAPI 回调端点
+   * 
+   * 当 SunoAPI 生成任务完成时，会向此地址发送 POST 请求
+   * 包含生成结果数据
+   * 
+   * 注意：生产环境需要配置 SUNOAPI_CALLBACK_URL 为公网可访问的 HTTPS 地址
+   */
+  app.post("/api/music/webhook", async (req, res) => {
+    try {
+      const timestamp = new Date().toISOString();
+      console.log(`[SunoAPI Webhook] ${timestamp} 收到回调请求`);
+      console.log(`[SunoAPI Webhook] Headers:`, JSON.stringify(req.headers, null, 2));
+      console.log(`[SunoAPI Webhook] Body:`, JSON.stringify(req.body, null, 2));
+
+      // TODO: 在这里处理回调数据
+      // 例如：更新订单状态、保存生成的音乐文件等
+      // const { taskId, status, audioUrl, ... } = req.body;
+
+      // 返回 200 表示回调处理成功
+      res.status(200).json({
+        success: true,
+        message: "Webhook received",
+        timestamp,
+      });
+    } catch (error) {
+      console.error("[SunoAPI Webhook] 处理回调失败:", error);
+      // 即使处理失败也返回 200，避免 SunoAPI 重复发送回调
+      res.status(200).json({
+        success: false,
+        error: "Webhook processing failed",
+      });
+    }
+  });
+
+  /**
+   * GET /api/music/tracks
+   * 获取用户的作品列表
+   *
+   * 查询参数:
+   * - page: number (可选，默认 1)
+   * - pageSize: number (可选，默认 20)
+   *
+   * 返回:
+   * {
+   *   "success": true,
+   *   "items": [{ id, title, prompt, audioUrl, imageUrl, duration, tags, modelName, createdAt }, ...],
+   *   "total": number,
+   *   "page": number,
+   *   "pageSize": number,
+   *   "totalPages": number
+   * }
+   */
+  app.get("/api/music/tracks", async (req, res) => {
+    try {
+      // 暂时使用固定的 userId，后续可以从 session 获取
+      const userId = req.session?.userId || "guest";
+
+      // 解析分页参数
+      const page = Math.max(1, parseInt(req.query.page as string) || 1);
+      const pageSize = Math.min(100, Math.max(1, parseInt(req.query.pageSize as string) || 20));
+
+      // 获取分页数据
+      const result = await trackStore.getTracksPaginated(userId, page, pageSize);
+
+      res.json({
+        success: true,
+        items: result.items.map((track) => ({
+          id: track.id,
+          title: track.title,
+          prompt: track.prompt,
+          audioUrl: track.audioUrl,
+          imageUrl: track.imageUrl,
+          duration: track.duration,
+          tags: track.tags,
+          modelName: track.modelName,
+          createdAt: track.createdAt,
+        })),
+        total: result.total,
+        page: result.page,
+        pageSize: result.pageSize,
+        totalPages: result.totalPages,
+      });
+    } catch (error) {
+      console.error("[API] /api/music/tracks error:", error);
+      res.status(500).json({
+        success: false,
+        error: `获取作品列表失败: ${(error as Error).message}`,
+      });
+    }
+  });
+
+  /**
+   * GET /api/music/tracks/:id
+   * 获取单条作品详情
+   *
+   * 路径参数:
+   * - id: string (Track ID)
+   *
+   * 返回:
+   * {
+   *   "success": true,
+   *   "track": { id, title, prompt, audioUrl, imageUrl, duration, tags, modelName, createdAt, ... }
+   * }
+   */
+  app.get("/api/music/tracks/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      if (!id || id.trim() === "") {
+        return res.status(400).json({
+          success: false,
+          error: "Track ID 不能为空",
+        });
+      }
+
+      // 根据 ID 查找 Track
+      const track = await trackStore.getTrackById(id);
+
+      if (!track) {
+        return res.status(404).json({
+          success: false,
+          error: "作品不存在",
+        });
+      }
+
+      // 检查访问权限（公开作品或者是自己的作品）
+      const userId = req.session?.userId || "guest";
+      if (!track.isPublic && track.userId !== userId) {
+        return res.status(403).json({
+          success: false,
+          error: "无权访问该作品",
+        });
+      }
+
+      res.json({
+        success: true,
+        track: {
+          id: track.id,
+          taskId: track.taskId,
+          title: track.title,
+          prompt: track.prompt,
+          audioUrl: track.audioUrl,
+          imageUrl: track.imageUrl,
+          duration: track.duration,
+          tags: track.tags,
+          modelName: track.modelName,
+          createdAt: track.createdAt,
+          isPublic: track.isPublic,
+        },
+      });
+    } catch (error) {
+      console.error("[API] /api/music/tracks/:id error:", error);
+      res.status(500).json({
+        success: false,
+        error: `获取作品详情失败: ${(error as Error).message}`,
+      });
     }
   });
 
