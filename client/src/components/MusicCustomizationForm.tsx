@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
-import { Music2, Guitar, Mic, Piano, Radio } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Music2, Guitar, Mic, Piano, Radio, Check, ArrowRight, Sparkles } from "lucide-react";
 import { useLanguage } from "./LanguageProvider";
 
 const musicStyles = [
@@ -22,7 +23,7 @@ const musicStyles = [
 const moodOptions = ["happy", "sad", "energetic", "calm", "romantic", "mysterious", "epic", "relaxed"];
 
 export function MusicCustomizationForm() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const [, setLocation] = useLocation();
   
   const [selectedStyle, setSelectedStyle] = useState<string>("pop");
@@ -74,53 +75,106 @@ export function MusicCustomizationForm() {
     setLocation("/payment");
   };
 
+  // 计算表单完成度
+  const formProgress = Math.round(
+    ((selectedStyle ? 1 : 0) +
+     (selectedMoods.length > 0 ? 1 : 0) +
+     (lyrics.length >= 10 ? 1 : 0) +
+     (duration[0] > 0 ? 1 : 0)) / 4 * 100
+  );
+
   return (
-    <Card className="w-full max-w-3xl mx-auto">
-      <CardHeader>
-        <CardTitle>{t.music.customizeTitle}</CardTitle>
-        <CardDescription>{t.music.customizeDescription}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
+    <div className="w-full max-w-4xl mx-auto space-y-6">
+      {/* 进度指示器 */}
+      <Card className="gradient-border">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-primary" />
+              <span className="font-semibold">{t.music.customizeTitle}</span>
+            </div>
+            <span className="text-sm font-medium text-muted-foreground">{formProgress}%</span>
+          </div>
+          <Progress value={formProgress} className="h-2" />
+          <p className="text-sm text-muted-foreground mt-2">{t.music.customizeDescription}</p>
+        </CardContent>
+      </Card>
+
+      <Card className="w-full border-2 shadow-xl">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-2xl">{t.music.customizeTitle}</CardTitle>
+          <CardDescription className="text-base">{t.music.customizeDescription}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-8">
         {/* Music Style Selection */}
-        <div className="space-y-3">
-          <Label>{t.music.style}</Label>
-          <div className="grid grid-cols-3 gap-3">
-            {musicStyles.map((style) => (
-              <button
-                key={style.id}
-                onClick={() => setSelectedStyle(style.id)}
-                className={`p-4 rounded-md border-2 transition-all hover-elevate ${
-                  selectedStyle === style.id
-                    ? "border-primary bg-primary/10"
-                    : "border-border"
-                }`}
-                data-testid={`button-style-${style.id}`}
-              >
-                <style.icon className="w-6 h-6 mx-auto mb-2" />
-                <span className="text-sm font-medium">{t.music.styles[style.id as keyof typeof t.music.styles]}</span>
-              </button>
-            ))}
+        <div className="space-y-4">
+          <Label className="text-base font-semibold flex items-center gap-2">
+            <Music2 className="w-5 h-5 text-primary" />
+            {t.music.style}
+          </Label>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {musicStyles.map((style) => {
+              const isSelected = selectedStyle === style.id;
+              return (
+                <button
+                  key={style.id}
+                  onClick={() => setSelectedStyle(style.id)}
+                  className={`group relative p-6 rounded-xl border-2 transition-all duration-300 hover:scale-105 ${
+                    isSelected
+                      ? "gradient-border border-primary bg-gradient-to-br from-primary/10 to-primary/5 shadow-lg"
+                      : "border-border hover:border-primary/50 bg-card"
+                  }`}
+                  data-testid={`button-style-${style.id}`}
+                >
+                  {isSelected && (
+                    <div className="absolute top-2 right-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                  <div className={`w-12 h-12 mx-auto mb-3 rounded-lg flex items-center justify-center transition-colors ${
+                    isSelected ? "bg-primary/20" : "bg-muted"
+                  }`}>
+                    <style.icon className={`w-6 h-6 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
+                  </div>
+                  <span className={`text-sm font-semibold block ${isSelected ? "text-primary" : "text-foreground"}`}>
+                    {t.music.styles[style.id as keyof typeof t.music.styles]}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
         {/* Mood Selection */}
-        <div className="space-y-3">
-          <Label>{t.music.moodMultiSelect}</Label>
-          <div className="flex flex-wrap gap-2">
-            {moodOptions.map((mood) => (
-              <Badge
-                key={mood}
-                variant={selectedMoods.includes(mood) ? "default" : "outline"}
-                className="cursor-pointer px-4 py-2"
-                onClick={() => toggleMood(mood)}
-                data-testid={`badge-mood-${mood}`}
-              >
-                {t.music.moods[mood as keyof typeof t.music.moods]}
-              </Badge>
-            ))}
+        <div className="space-y-4">
+          <Label className="text-base font-semibold">{t.music.moodMultiSelect}</Label>
+          <div className="flex flex-wrap gap-3">
+            {moodOptions.map((mood) => {
+              const isSelected = selectedMoods.includes(mood);
+              return (
+                <button
+                  key={mood}
+                  onClick={() => toggleMood(mood)}
+                  className={`group relative px-6 py-3 rounded-full border-2 transition-all duration-300 hover:scale-105 ${
+                    isSelected
+                      ? "gradient-primary text-white border-transparent shadow-lg"
+                      : "border-border bg-card hover:border-primary/50"
+                  }`}
+                  data-testid={`badge-mood-${mood}`}
+                >
+                  {isSelected && (
+                    <Check className="w-4 h-4 inline-block mr-2" />
+                  )}
+                  <span className="font-medium">{t.music.moods[mood as keyof typeof t.music.moods]}</span>
+                </button>
+              );
+            })}
           </div>
           {errors.moods && (
-            <p className="text-sm text-destructive">{errors.moods}</p>
+            <p className="text-sm text-destructive flex items-center gap-2">
+              <span>⚠️</span>
+              {errors.moods}
+            </p>
           )}
         </div>
 
@@ -211,16 +265,24 @@ export function MusicCustomizationForm() {
         </div>
 
         {/* Submit Button */}
-        <Button 
-          className="w-full" 
-          size="lg" 
-          onClick={handleSubmit}
-          data-testid="button-submit-customization"
-        >
-          <Music2 className="w-5 h-5 mr-2" />
-          {t.music.continuePay} ¥29.9
-        </Button>
+        <div className="pt-4 border-t">
+          <Button 
+            className="w-full group gradient-primary text-white shadow-xl hover:shadow-purple-500/50 transition-all duration-300 hover:scale-[1.02]" 
+            size="lg" 
+            onClick={handleSubmit}
+            data-testid="button-submit-customization"
+          >
+            <Music2 className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
+            <span className="font-semibold">{t.music.continuePay}</span>
+            <span className="ml-2 px-3 py-1 bg-white/20 rounded-lg">¥29.9</span>
+            <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+          </Button>
+          <p className="text-xs text-center text-muted-foreground mt-3">
+            {t.music.generatingTips || "点击继续后将跳转到支付页面"}
+          </p>
+        </div>
       </CardContent>
     </Card>
+    </div>
   );
 }

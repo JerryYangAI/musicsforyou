@@ -83,59 +83,70 @@ export default function PaymentPage() {
           </p>
         </div>
 
-        <div className="max-w-2xl mx-auto space-y-6">
-          {/* Supported Payment Methods */}
-          <div className="flex flex-wrap items-center justify-center gap-4 p-4 bg-accent/30 rounded-lg">
-            <span className="text-sm text-muted-foreground mr-2">
-              {locale === 'zh' ? '支持的支付方式：' : 'Supported payment methods:'}
-            </span>
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <CreditCard className="w-5 h-5" />
-              <span className="text-sm">{locale === 'zh' ? '信用卡' : 'Card'}</span>
-            </div>
-            <div className="flex items-center gap-1 text-[#07C160]">
-              <SiWechat className="w-5 h-5" />
-              <span className="text-sm">{locale === 'zh' ? '微信支付' : 'WeChat Pay'}</span>
-            </div>
-            <div className="flex items-center gap-1 text-[#1677FF]">
-              <SiAlipay className="w-5 h-5" />
-              <span className="text-sm">{locale === 'zh' ? '支付宝' : 'Alipay'}</span>
+        <div className="max-w-3xl mx-auto space-y-8">
+          {/* Supported Payment Methods Banner */}
+          <div className="glass p-6 rounded-xl border-2 border-primary/20">
+            <div className="flex flex-wrap items-center justify-center gap-6">
+              <span className="text-sm font-semibold text-muted-foreground">
+                {locale === 'zh' ? '支持的支付方式：' : 'Supported payment methods:'}
+              </span>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-card border">
+                <CreditCard className="w-5 h-5 text-primary" />
+                <span className="text-sm font-medium">{locale === 'zh' ? '信用卡' : 'Card'}</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-card border border-[#07C160]/30">
+                <SiWechat className="w-5 h-5 text-[#07C160]" />
+                <span className="text-sm font-medium">{locale === 'zh' ? '微信支付' : 'WeChat Pay'}</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-card border border-[#1677FF]/30">
+                <SiAlipay className="w-5 h-5 text-[#1677FF]" />
+                <span className="text-sm font-medium">{locale === 'zh' ? '支付宝' : 'Alipay'}</span>
+              </div>
             </div>
           </div>
 
           {/* Order Summary */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">
+          <Card className="border-2 shadow-lg">
+            <CardHeader className="pb-4 bg-gradient-to-r from-primary/5 to-transparent">
+              <CardTitle className="text-xl flex items-center gap-2">
+                <Music className="w-5 h-5 text-primary" />
                 {locale === 'zh' ? '订单摘要' : 'Order Summary'}
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    {locale === 'zh' ? '音乐风格' : 'Music Style'}
-                  </span>
-                  <span>{orderDetails.musicStyle}</span>
+            <CardContent className="pt-6">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 rounded-lg bg-muted/50">
+                    <p className="text-xs text-muted-foreground mb-1">
+                      {locale === 'zh' ? '音乐风格' : 'Music Style'}
+                    </p>
+                    <p className="font-semibold">{orderDetails.musicStyle}</p>
+                  </div>
+                  <div className="p-4 rounded-lg bg-muted/50">
+                    <p className="text-xs text-muted-foreground mb-1">
+                      {locale === 'zh' ? '时长' : 'Duration'}
+                    </p>
+                    <p className="font-semibold">{orderDetails.musicDuration}s</p>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">
+                <div className="p-4 rounded-lg bg-muted/50">
+                  <p className="text-xs text-muted-foreground mb-2">
                     {locale === 'zh' ? '情感氛围' : 'Mood'}
-                  </span>
-                  <span>{orderDetails.musicMoods.join(', ')}</span>
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {orderDetails.musicMoods.map((mood) => (
+                      <span key={mood} className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                        {mood}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    {locale === 'zh' ? '时长' : 'Duration'}
-                  </span>
-                  <span>{orderDetails.musicDuration}s</span>
-                </div>
-                <div className="border-t pt-2 mt-2">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">
+                <div className="border-t pt-4 mt-4">
+                  <div className="flex justify-between items-center p-4 rounded-lg gradient-primary/10">
+                    <span className="text-lg font-semibold">
                       {locale === 'zh' ? '应付金额' : 'Total'}
                     </span>
-                    <span className="text-2xl font-bold text-primary">
+                    <span className="text-3xl font-bold gradient-text">
                       ¥{orderDetails.amount}
                     </span>
                   </div>
@@ -145,33 +156,37 @@ export default function PaymentPage() {
           </Card>
 
           {/* Payment Form */}
-          <Card>
-            <CardHeader>
-              <CardTitle>
+          <Card className="border-2 shadow-xl">
+            <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent">
+              <CardTitle className="text-xl flex items-center gap-2">
+                <Lock className="w-5 h-5 text-primary" />
                 {locale === 'zh' ? '选择支付方式' : 'Choose Payment Method'}
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-base mt-2">
                 {locale === 'zh' 
                   ? '支持信用卡、微信支付、支付宝等多种支付方式' 
                   : 'Supports credit card, WeChat Pay, Alipay and more'}
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               <StripePaymentForm orderDetails={orderDetails} />
             </CardContent>
           </Card>
 
           {/* Security Notice */}
-          <div className="flex items-center justify-center gap-3 p-4 bg-accent/20 rounded-lg">
-            <ShieldCheck className="w-5 h-5 text-green-600" />
-            <div className="text-sm text-muted-foreground">
-              <span className="font-medium text-foreground">
+          <div className="flex items-center justify-center gap-3 p-6 glass rounded-xl border-2 border-green-500/20">
+            <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+              <ShieldCheck className="w-5 h-5 text-green-600 dark:text-green-400" />
+            </div>
+            <div className="text-sm">
+              <span className="font-semibold text-foreground block">
                 {locale === 'zh' ? '安全支付保障' : 'Secure Payment'}
               </span>
-              {' · '}
-              {locale === 'zh' 
-                ? '您的支付信息经过 256 位 SSL 加密保护' 
-                : 'Your payment is protected with 256-bit SSL encryption'}
+              <span className="text-muted-foreground">
+                {locale === 'zh' 
+                  ? '您的支付信息经过 256 位 SSL 加密保护' 
+                  : 'Your payment is protected with 256-bit SSL encryption'}
+              </span>
             </div>
           </div>
         </div>

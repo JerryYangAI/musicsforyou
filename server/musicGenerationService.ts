@@ -286,3 +286,4 @@ export class MusicGenerationService {
 // 单例模式
 export const musicGenerationService = new MusicGenerationService();
 
+

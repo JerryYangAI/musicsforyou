@@ -214,23 +214,38 @@ export function OrderList() {
   }
 
   const renderOrder = (order: Order) => (
-    <Card key={order.id} className="hover-elevate" data-testid={`card-order-${order.id}`}>
-      <CardHeader>
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <CardTitle className="text-lg">
-              {order.musicStyle} - {order.musicMoods.join(", ")}
-            </CardTitle>
-            <CardDescription>
-              {format(new Date(order.createdAt), "yyyy-MM-dd HH:mm")}
-            </CardDescription>
+    <Card 
+      key={order.id} 
+      className="group hover-elevate transition-all duration-300 border-2 hover:border-primary/30 hover:shadow-xl" 
+      data-testid={`card-order-${order.id}`}
+    >
+      <CardHeader className="pb-4">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-12 h-12 rounded-lg gradient-primary flex items-center justify-center flex-shrink-0">
+                <Music className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <CardTitle className="text-xl mb-1 truncate">
+                  {order.musicStyle} - {order.musicMoods.join(", ")}
+                </CardTitle>
+                <CardDescription className="flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  {format(new Date(order.createdAt), "yyyy-MM-dd HH:mm")}
+                </CardDescription>
+              </div>
+            </div>
           </div>
-          <Badge className={getStatusColor(order.orderStatus)} data-testid={`badge-status-${order.id}`}>
+          <Badge 
+            className={`${getStatusColor(order.orderStatus)} text-sm font-semibold px-4 py-1.5`} 
+            data-testid={`badge-status-${order.id}`}
+          >
             {t.orders[order.orderStatus as keyof typeof t.orders] || order.orderStatus}
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5">
         <div>
           <p className="text-sm text-muted-foreground mb-1">{t.orders.orderDetails}</p>
           <p className="text-sm" data-testid={`text-description-${order.id}`}>{order.musicDescription}</p>
@@ -249,30 +264,48 @@ export function OrderList() {
 
         {/* Music Generation Progress */}
         {(order.orderStatus === "processing" || order.orderStatus === "pending") && generationProgress[order.id] && (
-          <div className="space-y-2 pt-2 border-t">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
+          <div className="space-y-3 pt-4 border-t bg-gradient-to-r from-primary/5 to-transparent rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold flex items-center gap-2">
+                <Loader2 className="h-5 w-5 animate-spin text-primary" />
                 {t.orders.generating || "生成中..."}
               </span>
-              <span className="font-medium">{generationProgress[order.id].progress}%</span>
+              <span className="text-lg font-bold gradient-text">{generationProgress[order.id].progress}%</span>
             </div>
-            <Progress value={generationProgress[order.id].progress} className="h-2" />
+            <Progress 
+              value={generationProgress[order.id].progress} 
+              className="h-3 bg-muted"
+            />
+            <p className="text-xs text-muted-foreground">
+              {locale === 'zh' 
+                ? 'AI正在为您创作音乐，请稍候...' 
+                : 'AI is creating your music, please wait...'}
+            </p>
           </div>
         )}
 
         {order.musicFileUrl && (
-          <div className="pt-3 border-t space-y-3">
-            <div className="flex items-center justify-between flex-wrap gap-2">
-              <div className="flex items-center gap-2 text-sm text-green-700">
-                <Music className="h-4 w-4" />
-                <span>{t.orders.musicFile}</span>
+          <div className="pt-4 border-t space-y-4 bg-gradient-to-br from-green-50 to-transparent dark:from-green-950/20 rounded-lg p-4">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+                  <Music className="h-5 w-5 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-green-700 dark:text-green-400">
+                    {t.orders.musicFile}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {locale === 'zh' ? '音乐已生成完成' : 'Music generation completed'}
+                  </p>
+                </div>
               </div>
               <div className="flex gap-2">
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => handlePlayPause(order.id, order.musicFileUrl!)}
+                  className="hover:bg-primary hover:text-primary-foreground transition-colors"
                   data-testid={`button-preview-${order.id}`}
                 >
                   {playingAudio === order.id ? (
@@ -290,6 +323,7 @@ export function OrderList() {
                 <Button 
                   asChild
                   size="sm"
+                  className="gradient-primary text-white hover:shadow-lg transition-all"
                   data-testid={`button-download-${order.id}`}
                 >
                   <a href={order.musicFileUrl} target="_blank" rel="noopener noreferrer" download>
@@ -394,10 +428,19 @@ export function OrderList() {
   );
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-6">
-      <div className="flex items-center gap-3">
-        <Music className="w-6 h-6 text-primary" />
-        <h2 className="text-2xl font-bold">{t.orders.title}</h2>
+    <div className="w-full max-w-6xl mx-auto space-y-8">
+      <div className="flex items-center gap-4 pb-4 border-b">
+        <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center">
+          <Music className="w-6 h-6 text-white" />
+        </div>
+        <div>
+          <h2 className="text-3xl font-bold">{t.orders.title}</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            {locale === 'zh' 
+              ? '管理您的音乐订单和生成进度' 
+              : 'Manage your music orders and generation progress'}
+          </p>
+        </div>
       </div>
 
       {orders.length === 0 ? (

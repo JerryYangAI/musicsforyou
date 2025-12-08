@@ -1,0 +1,93 @@
+[
+  {
+    "id": "58c8953a-e03a-4950-b3b1-bdbc455c749e",
+    "userId": "092c5e8b-c139-4d00-bbbf-9553d962cb35",
+    "type": "pro-subscription",
+    "planId": "pro",
+    "amountCny": 19.9,
+    "creditsChange": 0,
+    "createdAt": "2025-12-07T02:27:52.129Z",
+    "meta": {
+      "previousPlan": "free",
+      "newExpiresAt": "2026-01-06T02:27:52.125Z"
+    }
+  },
+  {
+    "id": "33f7ff43-ea04-45eb-a66d-201899f7150a",
+    "userId": "092c5e8b-c139-4d00-bbbf-9553d962cb35",
+    "type": "credits-pack",
+    "packId": "credits_10",
+    "amountCny": 9.9,
+    "creditsChange": 10,
+    "createdAt": "2025-12-07T02:28:10.306Z",
+    "meta": {
+      "previousCredits": 0,
+      "newCredits": 10
+    }
+  },
+  {
+    "id": "38e66558-5ab8-4f84-a13f-8ce2ad0bdb8d",
+    "userId": "f006193e-a5ed-407b-a03a-727ba1b90c2b",
+    "type": "credits-pack",
+    "packId": "credits_10",
+    "amountCny": 9.9,
+    "creditsChange": 10,
+    "createdAt": "2025-12-07T02:29:51.927Z",
+    "meta": {
+      "previousCredits": 0,
+      "newCredits": 10
+    }
+  },
+  {
+    "id": "a8b2cee6-3868-4667-ac05-4e01cb08bdfc",
+    "userId": "f006193e-a5ed-407b-a03a-727ba1b90c2b",
+    "type": "credits-pack",
+    "packId": "credits_30",
+    "amountCny": 24.9,
+    "creditsChange": 30,
+    "createdAt": "2025-12-07T02:29:56.799Z",
+    "meta": {
+      "previousCredits": 10,
+      "newCredits": 40
+    }
+  },
+  {
+    "id": "3acb4e31-54cc-4d64-a618-d755b3c2a48b",
+    "userId": "cd192405-b8a3-47dd-a69f-f6f6c72db61c",
+    "type": "pro-subscription",
+    "planId": "pro",
+    "amountCny": 19.9,
+    "creditsChange": 0,
+    "createdAt": "2025-12-07T06:40:43.779Z",
+    "meta": {
+      "previousPlan": "free",
+      "newExpiresAt": "2026-01-06T06:40:43.769Z"
+    }
+  },
+  {
+    "id": "3ceb7423-2508-431e-bd93-2719dc6a208a",
+    "userId": "cd192405-b8a3-47dd-a69f-f6f6c72db61c",
+    "type": "credits-pack",
+    "packId": "pack-10",
+    "amountCny": 9.9,
+    "creditsChange": 10,
+    "createdAt": "2025-12-07T06:40:50.495Z",
+    "meta": {
+      "previousCredits": 0,
+      "newCredits": 10
+    }
+  },
+  {
+    "id": "f720dd8e-4249-494c-9877-681321ebfefa",
+    "userId": "cd192405-b8a3-47dd-a69f-f6f6c72db61c",
+    "type": "credits-pack",
+    "packId": "pack-30",
+    "amountCny": 24.9,
+    "creditsChange": 30,
+    "createdAt": "2025-12-07T06:40:57.571Z",
+    "meta": {
+      "previousCredits": 10,
+      "newCredits": 40
+    }
+  }
+]

@@ -25,6 +25,7 @@ import AboutPage from "@/pages/AboutPage";
 import ContactPage from "@/pages/ContactPage";
 import SunoDemo from "@/pages/SunoDemo";
 import MyWorks from "@/pages/MyWorks";
+import Pricing from "@/pages/Pricing";
 
 function Router() {
   useAnalytics();
@@ -45,6 +46,7 @@ function Router() {
       <Route path="/contact" component={ContactPage} />
       <Route path="/suno-demo" component={SunoDemo} />
       <Route path="/my-works" component={MyWorks} />
+      <Route path="/pricing" component={Pricing} />
       <Route component={NotFound} />
     </Switch>
   );

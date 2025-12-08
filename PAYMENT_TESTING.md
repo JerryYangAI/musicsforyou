@@ -197,3 +197,4 @@ TESTING_VITE_STRIPE_PUBLIC_KEY=pk_test_...
 
 **最后更新**: 2025-11-27
 **状态**: ✅ 微信支付和支付宝集成完成，可以开始测试
+

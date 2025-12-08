@@ -35,3 +35,4 @@ export const queueEvents = new QueueEvents("music-generation", {
 // 导出Redis连接（用于Worker）
 export { redisConnection };
 
+

@@ -1,0 +1,64 @@
+{
+  "users": [
+    {
+      "id": "9ff100d5-929c-422f-9873-b45056562e68",
+      "phone": "13800138000",
+      "phoneRegion": "CN",
+      "passwordHash": "$2b$10$3xpN31j3ZMCz6Cm1LQiCLeuELvdFnvdIUJ2.JS/FDAzCarrEAfASi",
+      "displayName": "测试用户",
+      "plan": "free",
+      "extraCredits": 0,
+      "planStartedAt": null,
+      "planExpiresAt": null,
+      "resetToken": null,
+      "resetTokenExpiresAt": null,
+      "createdAt": "2025-12-06T08:26:44.595Z"
+    },
+    {
+      "id": "f006193e-a5ed-407b-a03a-727ba1b90c2b",
+      "phone": "18516692739",
+      "phoneRegion": "CN",
+      "passwordHash": "$2b$10$hJlbU5HySr11yYznpyDATeVHAQszmsGYQ6LHcYuK5TL19gJNPSBL6",
+      "displayName": "Jerry",
+      "plan": "pro",
+      "extraCredits": 40,
+      "planStartedAt": null,
+      "planExpiresAt": null,
+      "resetToken": null,
+      "resetTokenExpiresAt": null,
+      "createdAt": "2025-12-06T08:55:45.764Z",
+      "updatedAt": "2025-12-07T02:29:56.798Z"
+    },
+    {
+      "id": "092c5e8b-c139-4d00-bbbf-9553d962cb35",
+      "phone": "13900001111",
+      "phoneRegion": "CN",
+      "passwordHash": "$2b$10$VFMilH5VxOoBpjVeVl/wI..4E3s0Xge6W.bSEZvI2ezeWdu9PJA4u",
+      "displayName": "测试升级用户",
+      "plan": "pro",
+      "extraCredits": 10,
+      "planStartedAt": "2025-12-07T02:27:52.125Z",
+      "planExpiresAt": "2026-01-06T02:27:52.125Z",
+      "resetToken": null,
+      "resetTokenExpiresAt": null,
+      "createdAt": "2025-12-07T02:27:25.193Z",
+      "updatedAt": "2025-12-07T02:28:10.305Z"
+    },
+    {
+      "id": "cd192405-b8a3-47dd-a69f-f6f6c72db61c",
+      "phone": "13761107549",
+      "phoneRegion": "CN",
+      "passwordHash": "$2b$10$dkjMcB0MXUIlhRWSv457ouqJoL2lQ8F9mE8PxZvuiu8Xj7oAyHlFW",
+      "displayName": "STA",
+      "plan": "pro",
+      "extraCredits": 40,
+      "planStartedAt": "2025-12-07T06:40:43.769Z",
+      "planExpiresAt": "2026-01-06T06:40:43.769Z",
+      "resetToken": null,
+      "resetTokenExpiresAt": null,
+      "createdAt": "2025-12-07T06:40:24.130Z",
+      "updatedAt": "2025-12-07T06:40:57.570Z"
+    }
+  ],
+  "lastUpdated": "2025-12-07T06:40:57.570Z"
+}

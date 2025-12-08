@@ -20,6 +20,9 @@ export interface GenerateMusicResponse {
   taskId?: string;
   raw?: any;
   error?: string;
+  code?: string; // 错误码，如 "DAILY_LIMIT"
+  todayCount?: number; // 今日已生成数量
+  dailyLimit?: number; // 每日限额
 }
 
 export interface MusicResultResponse {
@@ -27,6 +30,7 @@ export interface MusicResultResponse {
   status?: "pending" | "generating" | "finished" | "failed";
   audioUrl?: string | null;
   imageUrl?: string | null;
+  coverImageUrl?: string | null; // OpenAI 生成的高质量封面
   videoUrl?: string | null;
   raw?: any;
   error?: string;
@@ -39,6 +43,7 @@ export interface UseSunoMusicState {
   status: MusicResultResponse["status"] | null;
   audioUrl: string | null;
   imageUrl: string | null;
+  coverImageUrl: string | null; // OpenAI 生成的高质量封面
   videoUrl: string | null;
   error: string | null;
 }
@@ -122,6 +127,7 @@ export function useSunoMusic(): UseSunoMusicState & UseSunoMusicActions {
     status: null,
     audioUrl: null,
     imageUrl: null,
+    coverImageUrl: null,
     videoUrl: null,
     error: null,
   });
@@ -154,6 +160,7 @@ export function useSunoMusic(): UseSunoMusicState & UseSunoMusicActions {
           status: result.status ?? null,
           audioUrl: result.audioUrl ?? null,
           imageUrl: result.imageUrl ?? null,
+          coverImageUrl: result.coverImageUrl ?? null,
           videoUrl: result.videoUrl ?? null,
           error: null,
         }));

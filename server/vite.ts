@@ -22,7 +22,11 @@ export function log(message: string, source = "express") {
 export async function setupVite(app: Express, server: Server) {
   const serverOptions = {
     middlewareMode: true,
-    hmr: { server },
+    hmr: { 
+      server,
+      protocol: 'ws',
+      host: 'localhost',
+    },
     allowedHosts: true as const,
   };
 
@@ -33,16 +37,30 @@ export async function setupVite(app: Express, server: Server) {
       ...viteLogger,
       error: (msg, options) => {
         viteLogger.error(msg, options);
-        process.exit(1);
+        // 不退出进程，只记录错误
       },
     },
     server: serverOptions,
     appType: "custom",
   });
 
+  // Vite中间件处理所有Vite相关的请求（@vite/client, /src/*等）
   app.use(vite.middlewares);
-  app.use("*", async (req, res, next) => {
+  
+  // Catch-all路由：只处理HTML页面请求
+  // 这个路由应该在Vite中间件之后，让Vite先处理资源请求
+  app.get("*", async (req, res, next) => {
     const url = req.originalUrl;
+
+    // 跳过API路由、静态资源和Vite资源
+    if (
+      url.startsWith("/api") || 
+      url.startsWith("/objects") ||
+      url.startsWith("/@") ||
+      url.includes(".")
+    ) {
+      return next();
+    }
 
     try {
       const clientTemplate = path.resolve(
@@ -58,8 +76,10 @@ export async function setupVite(app: Express, server: Server) {
         `src="/src/main.tsx"`,
         `src="/src/main.tsx?v=${nanoid()}"`,
       );
+      
+      // 使用transformIndexHtml处理HTML
       const page = await vite.transformIndexHtml(url, template);
-      res.status(200).set({ "Content-Type": "text/html" }).end(page);
+      res.status(200).set({ "Content-Type": "text/html; charset=utf-8" }).end(page);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
       next(e);
