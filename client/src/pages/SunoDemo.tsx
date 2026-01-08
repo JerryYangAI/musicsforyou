@@ -352,17 +352,9 @@ export default function SunoDemo() {
                 <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
                   <Music className="w-6 h-6 text-primary" />
                 </div>
-                <h1 className="text-4xl font-bold">Suno AI 音乐生成</h1>
+                <h1 className="text-4xl font-bold">桃源音乐 AI 音乐生成</h1>
               </div>
-              <p className="text-xl text-muted-foreground mb-4">
-                使用 AI 生成你的专属音乐
-              </p>
-              <Link href="/my-works">
-                <Button variant="outline" className="gap-2">
-                  <FolderOpen className="w-4 h-4" />
-                  查看我的作品
-                </Button>
-              </Link>
+
             </div>
 
             {/* 额度统计 */}

@@ -3,4 +3,11 @@ dist
 .DS_Store
 server/public
 vite.config.ts.*
-*.tar.gzSuno-API/
+*.tar.gz
+
+# 本地 Suno 官方 SDK 仓库，不纳入版本控制
+Suno-API/
+
+# 本地环境变量配置，不要提交到 GitHub
+.env
+.env.*

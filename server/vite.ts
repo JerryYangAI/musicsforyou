@@ -4,7 +4,6 @@ import path from "path";
 import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
 import viteConfig from "../vite.config";
-import { nanoid } from "nanoid";
 
 const viteLogger = createLogger();
 
@@ -15,90 +14,86 @@ export function log(message: string, source = "express") {
     second: "2-digit",
     hour12: true,
   });
-
   console.log(`${formattedTime} [${source}] ${message}`);
 }
 
 export async function setupVite(app: Express, server: Server) {
-  const serverOptions = {
-    middlewareMode: true,
-    hmr: { 
-      server,
-      protocol: 'ws',
-      host: 'localhost',
-    },
-    allowedHosts: true as const,
-  };
-
   const vite = await createViteServer({
     ...viteConfig,
     configFile: false,
     customLogger: {
       ...viteLogger,
       error: (msg, options) => {
-        viteLogger.error(msg, options);
-        // 不退出进程，只记录错误
+        viteLogger.error(msg, options); // 只记录，不中断
       },
     },
-    server: serverOptions,
+    server: {
+      middlewareMode: true,
+      hmr: {
+        server,
+        protocol: "ws",
+        host: "localhost",
+      },
+      allowedHosts: true as const,
+    },
     appType: "custom",
   });
 
-  // Vite中间件处理所有Vite相关的请求（@vite/client, /src/*等）
+  // 1) 先交给 Vite 处理静态与 HMR 资源
   app.use(vite.middlewares);
-  
-  // Catch-all路由：只处理HTML页面请求
-  // 这个路由应该在Vite中间件之后，让Vite先处理资源请求
+
+  // 2) Catch-all：仅处理 HTML 页面，其余交给后续/静态/接口
   app.get("*", async (req, res, next) => {
     const url = req.originalUrl;
 
-    // 跳过API路由、静态资源和Vite资源
+    // 跳过 API、静态、Vite 资源（带扩展名/特殊前缀）
     if (
-      url.startsWith("/api") || 
+      url.startsWith("/api") ||
       url.startsWith("/objects") ||
       url.startsWith("/@") ||
+      url.startsWith("/src/") ||
       url.includes(".")
     ) {
       return next();
     }
 
     try {
-      const clientTemplate = path.resolve(
+      const templatePath = path.resolve(
         import.meta.dirname,
         "..",
         "client",
-        "index.html",
+        "index.html"
       );
+      let template = await fs.promises.readFile(templatePath, "utf-8");
 
-      // always reload the index.html file from disk incase it changes
-      let template = await fs.promises.readFile(clientTemplate, "utf-8");
-      template = template.replace(
-        `src="/src/main.tsx"`,
-        `src="/src/main.tsx?v=${nanoid()}"`,
-      );
-      
-      // 使用transformIndexHtml处理HTML
+      // 让 Vite 注入预编译脚本（React 插件需要）
       const page = await vite.transformIndexHtml(url, template);
-      res.status(200).set({ "Content-Type": "text/html; charset=utf-8" }).end(page);
+
+      res
+        .status(200)
+        .set({ "Content-Type": "text/html; charset=utf-8" })
+        .end(page);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
+      console.error("[vite] Error in catch-all route:", e);
       next(e);
     }
   });
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "public");
+  // 生产模式下的静态目录（vite build 输出 dist/public）
+  const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
 
   if (!fs.existsSync(distPath)) {
     throw new Error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`,
+      `Could not find the build directory: ${distPath}, please run "npm run build" first.`
     );
   }
 
   app.use(express.static(distPath));
 
-  // fall through to index.html if the file doesn't exist
+  // 兜底返回 index.html（SPA）
   app.use("*", (_req, res) => {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
