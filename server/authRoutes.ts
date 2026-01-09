@@ -14,14 +14,25 @@ const router = Router();
 
 // ============ 参数校验 Schema ============
 
-// 中国手机号正则
-const CHINA_PHONE_REGEX = /^1[3-9]\d{9}$/;
+// 手机号预处理：去除非数字，去掉前导 86/086，便于兼容 +86、空格/破折号
+const normalizePhone = (value: unknown) => {
+  if (typeof value !== "string") return value;
+  const digits = value.replace(/[^\d]/g, "");
+  const cleaned = digits.replace(/^0?86/, "");
+  return cleaned;
+};
+
+// 中国手机号正则（11 位，以 1 开头 3-9 段）
+const PHONE_SCHEMA = z.preprocess(
+  normalizePhone,
+  z.string().regex(/^1[3-9]\d{9}$/, "请输入有效的中国手机号")
+);
 
 // 注册 Schema
 const registerSchema = z.discriminatedUnion("method", [
   z.object({
     method: z.literal("phone"),
-    phone: z.string().regex(CHINA_PHONE_REGEX, "请输入有效的中国手机号"),
+    phone: PHONE_SCHEMA,
     password: z.string().min(6, "密码至少 6 位"),
     displayName: z.string().min(1, "请输入昵称").max(50, "昵称最多 50 个字符"),
   }),
@@ -37,7 +48,7 @@ const registerSchema = z.discriminatedUnion("method", [
 const loginSchema = z.discriminatedUnion("method", [
   z.object({
     method: z.literal("phone"),
-    phone: z.string().regex(CHINA_PHONE_REGEX, "请输入有效的中国手机号"),
+    phone: PHONE_SCHEMA,
     password: z.string().min(1, "请输入密码"),
   }),
   z.object({
@@ -51,7 +62,7 @@ const loginSchema = z.discriminatedUnion("method", [
 const requestResetSchema = z.discriminatedUnion("method", [
   z.object({
     method: z.literal("phone"),
-    phone: z.string().regex(CHINA_PHONE_REGEX, "请输入有效的中国手机号"),
+    phone: PHONE_SCHEMA,
   }),
   z.object({
     method: z.literal("email"),

@@ -200,7 +200,22 @@
       "createdAt": "2025-12-08T11:23:10.027Z",
       "userId": "cd192405-b8a3-47dd-a69f-f6f6c72db61c",
       "isPublic": true
+    },
+    {
+      "id": "937b14023aa4fc9ef29899e92be3c324",
+      "taskId": "937b14023aa4fc9ef29899e92be3c324",
+      "title": "海边夏天刚刚好",
+      "prompt": "[Verse 1]\n人字拖踩着沙\n脚印一路被浪花改写\n咸咸的风吹乱头发\n你笑着说别管它\n\n[Pre-Chorus]\n防晒味黏在肩膀\n时间慢得像在发呆\n看海鸥绕着远方打转\n这一刻什么都不重要\n\n[Chorus]\n海边夏天刚刚好\n阳光贴在你肩膀上晃耀\n你说世界先暂停一秒\n只听心跳\n海边夏天刚刚好\n把所有烦恼丢给海潮\n如果快乐能被打包\n我想整片海一起带走\n\n[Verse 2]\n冰可乐冒着泡\n气泡顺着手心往下跑\n你说快看那朵云好笑\n像极了我的侧脸线条\n\n[Pre-Chorus]\n脚尖被退下的水凉到\n你忽然靠过来打闹\n被溅湿的不是裤脚\n是脸上藏不住的心跳\n\n[Chorus]\n\n[Bridge]\n[低声呢喃]\n晚风慢下来\n夕阳把我们影子拉得很长\n如果明天各自忙乱\n就把今天收在口袋里珍藏\n\n[Chorus]",
+      "audioUrl": "https://musicfile.api.box/Y2JiNDFkNTMtOGZkMS00ZjI4LWJjMDgtY2JiNzIzZGVlYjJh.mp3",
+      "imageUrl": "https://musicfile.api.box/Y2JiNDFkNTMtOGZkMS00ZjI4LWJjMDgtY2JiNzIzZGVlYjJh.jpeg",
+      "coverImageUrl": null,
+      "duration": 119.96,
+      "tags": "Bouncy Mandopop groove with bright acoustic guitar, light synth plucks, and a playful bass line. Verses stay breezy and close, building into a wide, sunlit chorus with stacked group vocals and claps. Short bridge strips back to guitar and soft pads before a final, hooky chorus. Female vocals, clean and glossy mix with airy reverb.",
+      "modelName": "chirp-crow",
+      "createdAt": "2026-01-08T11:28:08.835Z",
+      "userId": "guest_a8cce4b8-e4c4-43a1-bb67-a3451fe0c113",
+      "isPublic": true
     }
   ],
-  "lastUpdated": "2025-12-08T11:23:28.836Z"
+  "lastUpdated": "2026-01-08T11:28:08.840Z"
 }

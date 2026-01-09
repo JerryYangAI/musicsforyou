@@ -58,7 +58,21 @@
       "resetTokenExpiresAt": null,
       "createdAt": "2025-12-07T06:40:24.130Z",
       "updatedAt": "2025-12-07T06:40:57.570Z"
+    },
+    {
+      "id": "a7bd7a6f-3d73-4d2d-917d-f11962716586",
+      "phone": "13761107548",
+      "phoneRegion": "CN",
+      "passwordHash": "$2b$10$527ex.HPrW/OkmtsL4.OJulsc3Hsi111M1EurzL6aKnx6TFqaAQlu",
+      "displayName": "STA",
+      "plan": "free",
+      "extraCredits": 0,
+      "planStartedAt": null,
+      "planExpiresAt": null,
+      "resetToken": null,
+      "resetTokenExpiresAt": null,
+      "createdAt": "2026-01-08T12:20:07.483Z"
     }
   ],
-  "lastUpdated": "2025-12-07T06:40:57.570Z"
+  "lastUpdated": "2026-01-08T12:20:07.485Z"
 }
